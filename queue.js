@@ -19,11 +19,13 @@
     if (!parallelism) parallelism = Infinity;
 
     queue.defer = function() {
-      var node = {index: ++index, args: arguments, next: null};
-      if (tail) tail.next = node, tail = tail.next;
-      else head = tail = node;
-      ++remaining;
-      pop();
+      if (!error) {
+        var node = {index: ++index, args: arguments, next: null};
+        if (tail) tail.next = node, tail = tail.next;
+        else head = tail = node;
+        ++remaining;
+        pop();
+      }
       return queue;
     };
 
@@ -51,7 +53,7 @@
           --active;
           if (error) {
             if (remaining) {
-              remaining = 0; // don't callback again
+              parallelism = remaining = 0; // don't pop or callback again
               head = tail = null; // cancel other queued tasks
               await(error, null); // callback with the error
             }

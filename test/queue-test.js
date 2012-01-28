@@ -13,7 +13,7 @@ suite.addBatch({
     }
   },
 
-  "queue of fs.stat": {
+  "example queue of fs.stat": {
     topic: function() {
       queue()
           .defer(fs.stat, __dirname + "/../Makefile")
@@ -32,9 +32,61 @@ suite.addBatch({
     }
   },
 
-  "fully-parallel queue of ten tasks": {
+  "queue of single synchronous task that errors": {
     topic: function() {
-      var t = task();
+      queue()
+          .defer(function(callback) { callback(-1); })
+          .await(this.callback);
+    },
+    "fails": function(error, results) {
+      assert.equal(error, -1);
+      assert.isNull(results);
+    }
+  },
+
+  "queue of single asynchronous task that errors": {
+    topic: function() {
+      queue()
+          .defer(function(callback) { process.nextTick(function() { callback(-1); }); })
+          .await(this.callback);
+    },
+    "fails": function(error, results) {
+      assert.equal(error, -1);
+      assert.isNull(results);
+    }
+  },
+
+  "queue with multiple tasks that error": {
+    topic: function() {
+      queue()
+          .defer(function(callback) { setTimeout(function() { callback(-2); }, 100); })
+          .defer(function(callback) { process.nextTick(function() { callback(-1); }); })
+          .defer(function(callback) { setTimeout(function() { callback(-3); }, 200); })
+          .await(this.callback);
+    },
+    "the first error is returned": function(error, results) {
+      assert.equal(error, -1);
+      assert.isNull(results);
+    }
+  },
+
+  "queue with multiple synchronous tasks that error": {
+    topic: function() {
+      queue()
+          .defer(function(callback) { callback(-1); })
+          .defer(function(callback) { callback(-2); })
+          .defer(function(callback) { throw new Error(); })
+          .await(this.callback);
+    },
+    "the first error prevents the other tasks from running": function(error, results) {
+      assert.equal(error, -1);
+      assert.isNull(results);
+    }
+  },
+
+  "fully-parallel queue of ten asynchronous tasks": {
+    topic: function() {
+      var t = asynchronousTask();
       queue()
           .defer(t)
           .defer(t)
@@ -56,9 +108,9 @@ suite.addBatch({
     }
   },
 
-  "partly-parallel queue of ten tasks": {
+  "partly-parallel queue of ten asynchronous tasks": {
     topic: function() {
-      var t = task();
+      var t = asynchronousTask();
       queue(3)
           .defer(t)
           .defer(t)
@@ -80,9 +132,9 @@ suite.addBatch({
     }
   },
 
-  "serialized queue of ten tasks": {
+  "serialized queue of ten asynchronous tasks": {
     topic: function() {
-      var t = task();
+      var t = asynchronousTask();
       queue(1)
           .defer(t)
           .defer(t)
@@ -102,18 +154,105 @@ suite.addBatch({
     "executes all tasks in parallel": function(error, results) {
       assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     }
+  },
+
+  "fully-parallel queue of ten synchronous tasks": {
+    topic: function() {
+      var t = synchronousTask();
+      queue()
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .await(this.callback);
+    },
+    "does not fail": function(error, results) {
+      assert.isNull(error);
+    },
+    "executes all tasks in series": function(error, results) {
+      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    }
+  },
+
+  "partly-parallel queue of ten synchronous tasks": {
+    topic: function() {
+      var t = synchronousTask();
+      queue(3)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .await(this.callback);
+    },
+    "does not fail": function(error, results) {
+      assert.isNull(error);
+    },
+    "executes all tasks in series": function(error, results) {
+      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    }
+  },
+
+  "serialized queue of ten synchronous tasks": {
+    topic: function() {
+      var t = synchronousTask();
+      queue(1)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .defer(t)
+          .await(this.callback);
+    },
+    "does not fail": function(error, results) {
+      assert.isNull(error);
+    },
+    "executes all tasks in series": function(error, results) {
+      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    }
   }
 
 });
 
 suite.export(module);
 
-function task() {
+function asynchronousTask() {
   var active = 0;
   return function(callback) {
     ++active;
     process.nextTick(function() {
-      callback(null, active--);
+      try {
+        callback(null, active);
+      } finally {
+        --active;
+      }
     });
+  };
+}
+
+function synchronousTask() {
+  var active = 0;
+  return function(callback) {
+    try {
+      callback(null, ++active);
+    } finally {
+      --active;
+    }
   };
 }
