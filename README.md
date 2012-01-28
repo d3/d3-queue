@@ -2,13 +2,21 @@
 
  **Queue.js** is yet another asynchronous helper library for JavaScript. Think of it as a minimalist version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism. Or, think of it as a version of [TameJs](http://tamejs.org/) that does not use code generation.
 
-For example:
+For example, if you wanted to stat two files in parallel:
 
 ```js
 queue()
     .defer(fs.stat, __dirname + "/../Makefile")
     .defer(fs.stat, __dirname + "/../package.json")
     .await(function(error, results) { console.log(results); });
+```
+
+Or, if you wanted to run a bazillion asynchronous tasks (here represented as an array of closures) serially:
+
+```js
+var q = queue(1);
+tasks.forEach(q.defer);
+q.await(function(error, results) { console.log("all done!"); });
 ```
 
 Queue.js can be run inside Node.js or in a browser.
