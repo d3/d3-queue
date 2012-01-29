@@ -15,7 +15,7 @@ Or, if you wanted to run a bazillion asynchronous tasks (here represented as an 
 
 ```js
 var q = queue(1);
-tasks.forEach(q.defer);
+tasks.forEach(function(t) { q.defer(t); });
 q.await(function(error, results) { console.log("all done!"); });
 ```
 

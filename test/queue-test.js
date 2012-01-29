@@ -84,6 +84,21 @@ suite.addBatch({
     }
   },
 
+  "queue of asynchronous closures, processed serially": {
+    topic: function() {
+      var tasks = [], task = asynchronousTask(), n = 10, q = queue(1);
+      while (--n >= 0) tasks.push(task);
+      tasks.forEach(function(t) { q.defer(t); });
+      q.await(this.callback)
+    },
+    "does not fail": function(error, results) {
+      assert.isNull(error);
+    },
+    "executes all tasks in series": function(error, results) {
+      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    }
+  },
+
   "fully-parallel queue of ten asynchronous tasks": {
     topic: function() {
       var t = asynchronousTask();
@@ -127,7 +142,7 @@ suite.addBatch({
     "does not fail": function(error, results) {
       assert.isNull(error);
     },
-    "executes all tasks in parallel": function(error, results) {
+    "executes at most three tasks in parallel": function(error, results) {
       assert.deepEqual(results, [3, 3, 3, 3, 3, 3, 3, 3, 2, 1]);
     }
   },
@@ -151,7 +166,7 @@ suite.addBatch({
     "does not fail": function(error, results) {
       assert.isNull(error);
     },
-    "executes all tasks in parallel": function(error, results) {
+    "executes all tasks in series": function(error, results) {
       assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
     }
   },
