@@ -2,8 +2,6 @@
   if (typeof module === "undefined") self.queue = queue;
   else module.exports = queue;
 
-  var slice = Array.prototype.slice;
-
   queue.version = "0.0.1";
 
   function queue(parallelism) {
@@ -14,13 +12,14 @@
         head, tail, // singly-linked list of deferrals
         error = null,
         results = [],
-        await = remember;
+        await = noop;
 
-    if (!parallelism) parallelism = Infinity;
+    if (arguments.length < 1) parallelism = Infinity;
 
     queue.defer = function() {
       if (!error) {
-        var node = {index: ++index, args: arguments, next: null};
+        var node = arguments;
+        node.index = ++index;
         if (tail) tail.next = node, tail = tail.next;
         else head = tail = node;
         ++remaining;
@@ -29,44 +28,42 @@
       return queue;
     };
 
-    queue.await = function(func) {
-      await = func;
+    queue.await = function(f) {
+      await = f;
       if (!remaining) await(error, results);
       return queue;
     };
 
-    function remember(e, r) {
-      error = e;
-      results = r;
-    }
-
     function pop() {
       if (head && active < parallelism) {
         var node = head,
-            func = node.args[0],
-            args = slice.call(node.args, 1),
-            index = node.index;
-        if (head == tail) head = tail = null;
+            f = node[0],
+            a = Array.prototype.slice.call(node, 1),
+            i = node.index;
+        if (head === tail) head = tail = null;
         else head = head.next;
         ++active;
-        args.push(function(error, result) {
+        a.push(function(e, r) {
           --active;
-          if (error) {
+          if (e) {
             if (remaining) {
-              parallelism = remaining = 0; // don't pop or callback again
-              head = tail = null; // cancel other queued tasks
-              await(error, null); // callback with the error
+              // clearing remaining cancels subsequent callbacks
+              // clearing head stops queued tasks from being executed
+              // setting error ignores subsequent calls to defer
+              await(error = e, remaining = results = head = tail = null);
             }
           } else {
-            results[index] = result;
-            if (!--remaining) await(null, results);
-            else pop();
+            results[i] = r;
+            if (--remaining) pop();
+            else await(null, results);
           }
         });
-        func.apply(null, args);
+        f.apply(null, a);
       }
     }
 
     return queue;
   }
+
+  function noop() {}
 })();
