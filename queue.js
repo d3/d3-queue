@@ -2,7 +2,7 @@
   if (typeof module === "undefined") self.queue = queue;
   else module.exports = queue;
 
-  queue.version = "0.0.1";
+  queue.version = "0.0.2";
 
   function queue(parallelism) {
     var queue = {},
@@ -45,6 +45,7 @@
         ++active;
         a.push(function(e, r) {
           --active;
+          if (error) return;
           if (e) {
             if (remaining) {
               // clearing remaining cancels subsequent callbacks
