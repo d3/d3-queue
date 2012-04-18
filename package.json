@@ -1,5 +1,5 @@
 {
-  "name": "queue",
+  "name": "queue-async",
   "version": "0.0.2",
   "description": "A little helper for asynchronous JavaScript.",
   "keywords": [
