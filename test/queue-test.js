@@ -21,14 +21,13 @@ suite.addBatch({
           .defer(fs.stat, __dirname + "/../package.json")
           .await(this.callback);
     },
-    "does not fail": function(error, results) {
+    "does not fail": function(error, one, two, three) {
       assert.isNull(error);
     },
-    "successfully executes the three tasks": function(error, results) {
-      assert.greater(results[0].size, 0);
-      assert.greater(results[1].size, 0);
-      assert.greater(results[2].size, 0);
-      assert.equal(results.length, 3);
+    "successfully executes the three tasks": function(error, one, two, three) {
+      assert.greater(one.size, 0);
+      assert.greater(two.size, 0);
+      assert.greater(three.size, 0);
     }
   },
 
@@ -38,9 +37,9 @@ suite.addBatch({
           .defer(function(callback) { callback(-1); })
           .await(this.callback);
     },
-    "fails": function(error, results) {
+    "fails": function(error, result) {
       assert.equal(error, -1);
-      assert.isNull(results);
+      assert.isUndefined(result);
     }
   },
 
@@ -50,9 +49,9 @@ suite.addBatch({
           .defer(function(callback) { process.nextTick(function() { callback(-1); }); })
           .await(this.callback);
     },
-    "fails": function(error, results) {
+    "fails": function(error, result) {
       assert.equal(error, -1);
-      assert.isNull(results);
+      assert.isUndefined(result);
     }
   },
 
@@ -64,9 +63,11 @@ suite.addBatch({
           .defer(function(callback) { setTimeout(function() { callback(-3); }, 200); })
           .await(this.callback);
     },
-    "the first error is returned": function(error, results) {
+    "the first error is returned": function(error, one, two, three) {
       assert.equal(error, -1);
-      assert.isNull(results);
+      assert.isUndefined(one);
+      assert.isUndefined(two);
+      assert.isUndefined(three);
     }
   },
 
@@ -77,9 +78,10 @@ suite.addBatch({
           .defer(function(callback) { process.nextTick(function() { callback(null, 'ok'); }); })
           .await(this.callback);
     },
-    "the first error is returned": function(error, results) {
+    "the first error is returned": function(error, one, two) {
       assert.equal(error, -1);
-      assert.isNull(results);
+      assert.isUndefined(one);
+      assert.isUndefined(two);
     }
   },
 
@@ -91,9 +93,11 @@ suite.addBatch({
           .defer(function(callback) { throw new Error(); })
           .await(this.callback);
     },
-    "the first error prevents the other tasks from running": function(error, results) {
+    "the first error prevents the other tasks from running": function(error, one, two, three) {
       assert.equal(error, -1);
-      assert.isNull(results);
+      assert.isUndefined(one);
+      assert.isUndefined(two);
+      assert.isUndefined(three);
     }
   },
 
@@ -102,7 +106,7 @@ suite.addBatch({
       var tasks = [], task = asynchronousTask(), n = 10, q = queue(1);
       while (--n >= 0) tasks.push(task);
       tasks.forEach(function(t) { q.defer(t); });
-      q.await(this.callback)
+      q.awaitAll(this.callback)
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
@@ -126,7 +130,7 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .defer(t)
-          .await(this.callback);
+          .awaitAll(this.callback);
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
@@ -150,7 +154,7 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .defer(t)
-          .await(this.callback);
+          .awaitAll(this.callback);
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
@@ -174,7 +178,7 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .defer(t)
-          .await(this.callback);
+          .awaitAll(this.callback);
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
@@ -198,7 +202,7 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .defer(t)
-          .await(this.callback);
+          .awaitAll(this.callback);
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
@@ -222,7 +226,7 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .defer(t)
-          .await(this.callback);
+          .awaitAll(this.callback);
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
@@ -246,7 +250,7 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .defer(t)
-          .await(this.callback);
+          .awaitAll(this.callback);
     },
     "does not fail": function(error, results) {
       assert.isNull(error);

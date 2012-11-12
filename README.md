@@ -8,7 +8,7 @@ For example, if you wanted to stat two files in parallel:
 queue()
     .defer(fs.stat, __dirname + "/../Makefile")
     .defer(fs.stat, __dirname + "/../package.json")
-    .await(function(error, results) { console.log(results); });
+    .await(function(error, file1, file2) { console.log(file1, file2); });
 ```
 
 Or, if you wanted to run a bazillion asynchronous tasks (here represented as an array of closures) serially:
@@ -16,7 +16,7 @@ Or, if you wanted to run a bazillion asynchronous tasks (here represented as an 
 ```js
 var q = queue(1);
 tasks.forEach(function(t) { q.defer(t); });
-q.await(function(error, results) { console.log("all done!"); });
+q.awaitAll(function(error, results) { console.log("all done!"); });
 ```
 
 Queue.js can be run inside Node.js or in a browser.
@@ -32,9 +32,10 @@ Constructs a new queue with the specified *parallelism*. If *parallelism* is not
 Adds the specified *method* to the queue, with any optional *arguments*. The *method* is called with the optional arguments and a final callback argument, which should be called when the task has finished.
 
 ### queue.await(callback)
+### queue.awaitAll(callback)
 
-Sets the *callback* to be notified when all deferred tasks have finished.
+Sets the *callback* to be notified when all deferred tasks have finished. If *await* is used, each result is passed as a separate argument; if *awaitAll* is used, the entire array of results is passed as a single argument.
 
 ## Callbacks
 
-The callbacks follow the Node.js convention where the first argument is an optional error object, and the second is used to pass on the result of an operation.
+The callbacks follow the Node.js convention where the first argument is an optional error object, and the second is used to pass on the result of an operation. Queue.js does not directly support asynchronous functions that return multiple results; however, you can homogenize such functions by wrapping them and converting multiple results into a single object or array.
