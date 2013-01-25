@@ -1,6 +1,8 @@
-{
+var queue = require("../queue");
+
+console.log(JSON.stringify({
   "name": "queue-async",
-  "version": "1.0.1",
+  "version": queue.version,
   "description": "A little helper for asynchronous JavaScript.",
   "keywords": [
     "asynchronous",
@@ -23,4 +25,4 @@
   "scripts": {
     "test": "./node_modules/vows/bin/vows"
   }
-}
+}, null, 2));

@@ -2,7 +2,7 @@
   if (typeof module === "undefined") self.queue = queue;
   else module.exports = queue;
 
-  queue.version = "1.0.0";
+  queue.version = "1.0.1";
 
   function queue(parallelism) {
     var queue = {},
