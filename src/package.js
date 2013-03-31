@@ -15,14 +15,14 @@ console.log(JSON.stringify({
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/mbostock/queue.git"
+    "url": "https://github.com/mbostock/queue.git"
   },
   "main": "queue.js",
   "devDependencies": {
-    "uglify-js": "2.2.3",
-    "vows": "0.7.0"
+    "uglify-js": "~2.2.5",
+    "vows": "~0.7.0"
   },
   "scripts": {
-    "test": "./node_modules/vows/bin/vows"
+    "test": "node_modules/.bin/vows"
   }
 }, null, 2));

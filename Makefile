@@ -1,7 +1,3 @@
-NODE_PATH ?= ./node_modules
-JS_COMPILER = $(NODE_PATH)/uglify-js/bin/uglifyjs
-JS_TESTER = $(NODE_PATH)/vows/bin/vows
-
 all: \
 	queue.min.js \
 	component.json \
@@ -18,11 +14,12 @@ package.json: src/package.js queue.js
 	@chmod a-w $@
 
 test: all
-	@$(JS_TESTER)
+	node_modules/.bin/vows
+	@echo
 
 %.min.js: %.js Makefile
 	@rm -f $@
-	$(JS_COMPILER) < $< > $@
+	node_modules/.bin/uglifyjs $< -c -m -o $@
 
 clean:
 	rm -f queue.min.js component.json package.json

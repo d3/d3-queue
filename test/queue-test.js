@@ -188,10 +188,10 @@ suite.addBatch({
     }
   },
 
-  "fully-parallel queue of ten synchronous tasks": {
+  "serialized queue of ten deferred synchronous tasks": {
     topic: function() {
-      var t = synchronousTask();
-      queue()
+      var t = deferredSynchronousTask();
+      queue(1)
           .defer(t)
           .defer(t)
           .defer(t)
@@ -203,12 +203,13 @@ suite.addBatch({
           .defer(t)
           .defer(t)
           .awaitAll(this.callback);
+      t.finish();
     },
     "does not fail": function(error, results) {
       assert.isNull(error);
     },
-    "executes all tasks in series": function(error, results) {
-      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    "executes all tasks in series, within the callback of the first task": function(error, results) {
+      assert.deepEqual(results, [1, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
     }
   },
 
@@ -287,4 +288,32 @@ function synchronousTask() {
       --active;
     }
   };
+}
+
+function deferredSynchronousTask() {
+  var active = 0,
+      callbacks = [];
+
+  function task(callback) {
+    if (callbacks) return callbacks.push(callback);
+    try {
+      callback(null, ++active);
+    } finally {
+      --active;
+    }
+  }
+
+  task.finish = function() {
+    var callbacks_ = callbacks.slice();
+    callbacks = null;
+    callbacks_.forEach(function(callback) {
+      try {
+        callback(null, ++active);
+      } finally {
+        --active;
+      }
+    });
+  };
+
+  return task;
 }

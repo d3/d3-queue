@@ -1,8 +1,9 @@
 (function() {
   if (typeof module === "undefined") self.queue = queue;
   else module.exports = queue;
+  queue.version = "1.0.2";
 
-  queue.version = "1.0.1";
+  var slice = [].slice;
 
   function queue(parallelism) {
     var queue = {},
@@ -14,13 +15,13 @@
         await = noop,
         awaitAll;
 
-    if (arguments.length < 1) parallelism = Infinity;
+    if (!parallelism) parallelism = Infinity;
 
     queue.defer = function() {
       if (!error) {
         var node = arguments;
-        node.index = results.push(undefined) - 1;
-        if (tail) tail.next = node, tail = tail.next;
+        node.i = results.push(undefined) - 1;
+        if (tail) tail._ = node, tail = tail._;
         else head = tail = node;
         ++remaining;
         pop();
@@ -43,13 +44,14 @@
     };
 
     function pop() {
-      if (head && active < parallelism) {
+      var popping;
+      while (popping = head && active < parallelism) {
         var node = head,
             f = node[0],
-            a = Array.prototype.slice.call(node, 1),
-            i = node.index;
+            a = slice.call(node, 1),
+            i = node.i;
         if (head === tail) head = tail = null;
-        else head = head.next;
+        else head = head._;
         ++active;
         a.push(function(e, r) {
           --active;
@@ -63,7 +65,7 @@
             notify();
           } else {
             results[i] = r;
-            if (--remaining) pop();
+            if (--remaining) popping || pop();
             else notify();
           }
         });
