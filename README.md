@@ -27,15 +27,19 @@ Queue.js can be run inside Node.js or in a browser.
 
 Constructs a new queue with the specified *parallelism*. If *parallelism* is not specified, the queue has infinite parallelism. Otherwise, *parallelism* is a positive integer. For example, if *parallelism* is 1, then all tasks will be run in series. If *parallelism* is 3, then at most three tasks will be allowed to proceed concurrently; this is useful, for example, when loading resources in a web browser.
 
-### queue.defer(method[, arguments…])
+### queue.defer(task[, arguments…])
 
-Adds the specified *method* to the queue, with any optional *arguments*. The *method* is called with the optional arguments and a final callback argument, which should be called when the task has finished.
+Adds the specified asynchronous *task* function to the queue, with any optional *arguments*. The *task* will be called with the optional arguments and an additional callback argument; the callback should be invoked when the task has finished.
+
+Tasks can only be deferred before the *await* callback is set. If a task is deferred after the await callback is set, the behavior of the queue is undefined.
 
 ### queue.await(callback)
 ### queue.awaitAll(callback)
 
-Sets the *callback* to be notified when all deferred tasks have finished. If *await* is used, each result is passed as a separate argument; if *awaitAll* is used, the entire array of results is passed as a single argument.
+Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or undefined if no error occurred. If *await* is used, each result is passed as an additional separate argument; if *awaitAll* is used, the entire array of results is passed as the second argument to the callback.
+
+This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
 
 ## Callbacks
 
-The callbacks follow the Node.js convention where the first argument is an optional error object, and the second is used to pass on the result of an operation. Queue.js does not directly support asynchronous functions that return multiple results; however, you can homogenize such functions by wrapping them and converting multiple results into a single object or array.
+The callbacks follow the Node.js convention where the first argument is an optional error object and the second argument is the result of the task. Queue.js does not support asynchronous functions that return multiple results; however, you can homogenize such functions by wrapping them and converting multiple results into a single object or array.
