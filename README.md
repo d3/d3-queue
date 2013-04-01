@@ -29,16 +29,12 @@ Constructs a new queue with the specified *parallelism*. If *parallelism* is not
 
 ### queue.defer(task[, arguments…])
 
-Adds the specified asynchronous *task* function to the queue, with any optional *arguments*. The *task* will be called with the optional arguments and an additional callback argument; the callback should be invoked when the task has finished.
-
-Tasks can only be deferred before the *await* callback is set. If a task is deferred after the await callback is set, the behavior of the queue is undefined.
+Adds the specified asynchronous *task* function to the queue, with any optional *arguments*. The *task* will be called with the optional arguments and an additional callback argument; the callback should be invoked when the task has finished. Tasks can only be deferred before the *await* callback is set. If a task is deferred after the await callback is set, the behavior of the queue is undefined.
 
 ### queue.await(callback)
 ### queue.awaitAll(callback)
 
-Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or undefined if no error occurred. If *await* is used, each result is passed as an additional separate argument; if *awaitAll* is used, the entire array of results is passed as the second argument to the callback.
-
-This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
+Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or undefined if no error occurred. If *await* is used, each result is passed as an additional separate argument; if *awaitAll* is used, the entire array of results is passed as the second argument to the callback. This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
 
 ## Callbacks
 
