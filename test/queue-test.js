@@ -112,7 +112,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes all tasks in series": function(error, results) {
-      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      assert.deepEqual(results, [
+        {active: 1, index: 0},
+        {active: 1, index: 1},
+        {active: 1, index: 2},
+        {active: 1, index: 3},
+        {active: 1, index: 4},
+        {active: 1, index: 5},
+        {active: 1, index: 6},
+        {active: 1, index: 7},
+        {active: 1, index: 8},
+        {active: 1, index: 9}
+      ]);
     }
   },
 
@@ -136,7 +147,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes all tasks in parallel": function(error, results) {
-      assert.deepEqual(results, [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]);
+      assert.deepEqual(results, [
+        {active: 10, index: 0},
+        {active: 9, index: 1},
+        {active: 8, index: 2},
+        {active: 7, index: 3},
+        {active: 6, index: 4},
+        {active: 5, index: 5},
+        {active: 4, index: 6},
+        {active: 3, index: 7},
+        {active: 2, index: 8},
+        {active: 1, index: 9}
+      ]);
     }
   },
 
@@ -160,7 +182,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes at most three tasks in parallel": function(error, results) {
-      assert.deepEqual(results, [3, 3, 3, 3, 3, 3, 3, 3, 2, 1]);
+      assert.deepEqual(results, [
+        {active: 3, index: 0},
+        {active: 3, index: 1},
+        {active: 3, index: 2},
+        {active: 3, index: 3},
+        {active: 3, index: 4},
+        {active: 3, index: 5},
+        {active: 3, index: 6},
+        {active: 3, index: 7},
+        {active: 2, index: 8},
+        {active: 1, index: 9}
+      ]);
     }
   },
 
@@ -184,7 +217,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes all tasks in series": function(error, results) {
-      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      assert.deepEqual(results, [
+        {active: 1, index: 0},
+        {active: 1, index: 1},
+        {active: 1, index: 2},
+        {active: 1, index: 3},
+        {active: 1, index: 4},
+        {active: 1, index: 5},
+        {active: 1, index: 6},
+        {active: 1, index: 7},
+        {active: 1, index: 8},
+        {active: 1, index: 9}
+      ]);
     }
   },
 
@@ -209,7 +253,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes all tasks in series, within the callback of the first task": function(error, results) {
-      assert.deepEqual(results, [1, 2, 2, 2, 2, 2, 2, 2, 2, 2]);
+      assert.deepEqual(results, [
+        {active: 1, index: 0},
+        {active: 2, index: 1},
+        {active: 2, index: 2},
+        {active: 2, index: 3},
+        {active: 2, index: 4},
+        {active: 2, index: 5},
+        {active: 2, index: 6},
+        {active: 2, index: 7},
+        {active: 2, index: 8},
+        {active: 2, index: 9}
+      ]);
     }
   },
 
@@ -233,7 +288,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes all tasks in series": function(error, results) {
-      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      assert.deepEqual(results, [
+        {active: 1, index: 0},
+        {active: 1, index: 1},
+        {active: 1, index: 2},
+        {active: 1, index: 3},
+        {active: 1, index: 4},
+        {active: 1, index: 5},
+        {active: 1, index: 6},
+        {active: 1, index: 7},
+        {active: 1, index: 8},
+        {active: 1, index: 9}
+      ]);
     }
   },
 
@@ -257,7 +323,18 @@ suite.addBatch({
       assert.isNull(error);
     },
     "executes all tasks in series": function(error, results) {
-      assert.deepEqual(results, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+      assert.deepEqual(results, [
+        {active: 1, index: 0},
+        {active: 1, index: 1},
+        {active: 1, index: 2},
+        {active: 1, index: 3},
+        {active: 1, index: 4},
+        {active: 1, index: 5},
+        {active: 1, index: 6},
+        {active: 1, index: 7},
+        {active: 1, index: 8},
+        {active: 1, index: 9}
+      ]);
     }
   }
 
@@ -265,13 +342,17 @@ suite.addBatch({
 
 suite.export(module);
 
-function asynchronousTask() {
+function asynchronousTask(counter) {
   var active = 0;
+
+  if (!counter) counter = {scheduled: 0};
+
   return function(callback) {
+    var index = counter.scheduled++;
     ++active;
     process.nextTick(function() {
       try {
-        callback(null, active);
+        callback(null, {active: active, index: index});
       } finally {
         --active;
       }
@@ -279,36 +360,40 @@ function asynchronousTask() {
   };
 }
 
-function synchronousTask() {
+function synchronousTask(counter) {
   var active = 0;
+
+  if (!counter) counter = {scheduled: 0};
+
   return function(callback) {
     try {
-      callback(null, ++active);
+      callback(null, {active: ++active, index: counter.scheduled++});
     } finally {
       --active;
     }
   };
 }
 
-function deferredSynchronousTask() {
-  var active = 0,
-      callbacks = [];
+function deferredSynchronousTask(counter) {
+  var active = 0, deferrals = [];
+
+  if (!counter) counter = {scheduled: 0};
 
   function task(callback) {
-    if (callbacks) return callbacks.push(callback);
+    if (deferrals) return deferrals.push({callback: callback, index: counter.scheduled++});
     try {
-      callback(null, ++active);
+      callback(null, {active: ++active, index: counter.scheduled++});
     } finally {
       --active;
     }
   }
 
   task.finish = function() {
-    var callbacks_ = callbacks.slice();
-    callbacks = null;
-    callbacks_.forEach(function(callback) {
+    var deferrals_ = deferrals.slice();
+    deferrals = null;
+    deferrals_.forEach(function(deferral) {
       try {
-        callback(null, ++active);
+        deferral.callback(null, {active: ++active, index: deferral.index});
       } finally {
         --active;
       }

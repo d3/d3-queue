@@ -1,28 +1,26 @@
 (function() {
   if (typeof module === "undefined") self.queue = queue;
   else module.exports = queue;
-  queue.version = "1.0.2";
+  queue.version = "1.0.3";
 
   var slice = [].slice;
 
   function queue(parallelism) {
     var queue = {},
-        active = 0, // number of in-flight deferrals
-        remaining = 0, // number of deferrals remaining
-        head, tail, // singly-linked list of deferrals
-        error = null,
-        results = [],
+        deferrals = [],
+        started = 0, // number of deferrals that have been started (and perhaps finished)
+        active = 0, // number of deferrals currently being executed (started but not finished)
+        remaining = 0, // number of deferrals not yet finished
+        popping, // inside a synchronous deferral callback?
+        error,
         await = noop,
-        awaitAll;
+        all;
 
     if (!parallelism) parallelism = Infinity;
 
     queue.defer = function() {
       if (!error) {
-        var node = arguments;
-        node.i = results.push(undefined) - 1;
-        if (tail) tail._ = node, tail = tail._;
-        else head = tail = node;
+        deferrals.push(arguments);
         ++remaining;
         pop();
       }
@@ -31,52 +29,49 @@
 
     queue.await = function(f) {
       await = f;
-      awaitAll = false;
+      all = false;
       if (!remaining) notify();
       return queue;
     };
 
     queue.awaitAll = function(f) {
       await = f;
-      awaitAll = true;
+      all = true;
       if (!remaining) notify();
       return queue;
     };
 
     function pop() {
-      var popping;
-      while (popping = head && active < parallelism) {
-        var node = head,
-            f = node[0],
-            a = slice.call(node, 1),
-            i = node.i;
-        if (head === tail) head = tail = null;
-        else head = head._;
+      while (popping = started < deferrals.length && active < parallelism) {
+        var i = started++,
+            d = deferrals[i],
+            a = slice.call(d, 1);
+        a.push(callback(i));
         ++active;
-        a.push(function(e, r) {
-          --active;
-          if (error != null) return;
-          if (e != null) {
-            // clearing remaining cancels subsequent callbacks
-            // clearing head stops queued tasks from being executed
-            // setting error ignores subsequent calls to defer
-            error = e;
-            remaining = results = head = tail = null;
-            notify();
-          } else {
-            results[i] = r;
-            if (--remaining) popping || pop();
-            else notify();
-          }
-        });
-        f.apply(null, a);
+        d[0].apply(null, a);
       }
+    }
+
+    function callback(i) {
+      return function(e, r) {
+        --active;
+        if (error != null) return;
+        if (e != null) {
+          error = e; // ignore new deferrals and squelch active callbacks
+          started = remaining = NaN; // stop queued deferrals from starting
+          notify();
+        } else {
+          deferrals[i] = r;
+          if (--remaining) popping || pop();
+          else notify();
+        }
+      };
     }
 
     function notify() {
       if (error != null) await(error);
-      else if (awaitAll) await(null, results);
-      else await.apply(null, [null].concat(results));
+      else if (all) await(null, deferrals);
+      else await.apply(null, [null].concat(deferrals));
     }
 
     return queue;
