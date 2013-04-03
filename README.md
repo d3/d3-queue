@@ -34,7 +34,7 @@ Adds the specified asynchronous *task* function to the queue, with any optional 
 ### queue.await(callback)
 ### queue.awaitAll(callback)
 
-Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If *await* is used, each result is passed as an additional separate argument; if *awaitAll* is used, the entire array of results is passed as the second argument to the callback. This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
+Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If *await* is used, each result is passed as an additional separate argument; if *awaitAll* is used, the entire array of results is passed as the second argument to the callback. If all callbacks have already been completed by the time the *await* or *awaitAll* callback is set, the callback will be invoked immediately. This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
 
 ## Callbacks
 
