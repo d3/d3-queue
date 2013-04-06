@@ -1,12 +1,12 @@
 (function() {
   if (typeof module === "undefined") self.queue = queue;
   else module.exports = queue;
-  queue.version = "1.0.3";
+  queue.version = "1.0.4";
 
   var slice = [].slice;
 
   function queue(parallelism) {
-    var queue = {},
+    var q,
         tasks = [],
         started = 0, // number of tasks that have been started (and perhaps finished)
         active = 0, // number of tasks currently being executed (started but not finished)
@@ -17,29 +17,6 @@
         all;
 
     if (!parallelism) parallelism = Infinity;
-
-    queue.defer = function() {
-      if (!error) {
-        tasks.push(arguments);
-        ++remaining;
-        pop();
-      }
-      return queue;
-    };
-
-    queue.await = function(f) {
-      await = f;
-      all = false;
-      if (!remaining) notify();
-      return queue;
-    };
-
-    queue.awaitAll = function(f) {
-      await = f;
-      all = true;
-      if (!remaining) notify();
-      return queue;
-    };
 
     function pop() {
       while (popping = started < tasks.length && active < parallelism) {
@@ -74,7 +51,28 @@
       else await.apply(null, [error].concat(tasks));
     }
 
-    return queue;
+    return q = {
+      defer: function() {
+        if (!error) {
+          tasks.push(arguments);
+          ++remaining;
+          pop();
+        }
+        return q;
+      },
+      await: function(f) {
+        await = f;
+        all = false;
+        if (!remaining) notify();
+        return q;
+      },
+      awaitAll: function(f) {
+        await = f;
+        all = true;
+        if (!remaining) notify();
+        return q;
+      }
+    };
   }
 
   function noop() {}
