@@ -21,6 +21,22 @@ q.awaitAll(function(error, results) { console.log("all done!"); });
 
 Queue.js can be run inside Node.js or in a browser.
 
+## Installation
+
+In a browser, you can use the official hosted copy on [d3js.org](http://d3js.org):
+
+```html
+<script src="http://d3js.org/queue.v1.min.js"></script>
+```
+
+In Node, use [NPM](http://npmjs.org) to install:
+
+```bash
+npm install queue-async
+```
+
+Note that the package name is [queue-async](https://npmjs.org/package/queue-async); the name “queue” was already taken.
+
 ## API Reference
 
 ### queue([parallelism])
