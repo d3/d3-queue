@@ -29,13 +29,23 @@ In a browser, you can use the official hosted copy on [d3js.org](http://d3js.org
 <script src="http://d3js.org/queue.v1.min.js"></script>
 ```
 
+Queue.js supports the asynchronous module definition (AMD) API. For example, if you use [RequireJS](http://requirejs.org/), you may load as follows:
+
+```js
+require.config({paths: {queue: "http://d3js.org/queue.v1.min"}});
+
+require(["queue"], function(queue) {
+  console.log(queue.version);
+});
+```
+
 In Node, use [NPM](http://npmjs.org) to install:
 
 ```bash
 npm install queue-async
 ```
 
-Note that the package name is [queue-async](https://npmjs.org/package/queue-async); the name “queue” was already taken.
+And then `require("queue-async")`. (The package name is [queue-async](https://npmjs.org/package/queue-async) because the name “queue” was already taken.)
 
 ## API Reference
 
