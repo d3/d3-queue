@@ -1,8 +1,4 @@
 (function() {
-  if (typeof module === "undefined") self.queue = queue;
-  else module.exports = queue;
-  queue.version = "1.0.4";
-
   var slice = [].slice;
 
   function queue(parallelism) {
@@ -76,4 +72,9 @@
   }
 
   function noop() {}
+
+  queue.version = "1.0.5";
+  if (typeof define === "function" && define.amd) define(queue);
+  else if (typeof module === "object" && module.exports) module.exports = queue;
+  else this.queue = queue;
 })();
