@@ -1,25 +1,28 @@
-all: \
+GENERATED_FILES = \
 	queue.min.js \
 	component.json \
 	package.json
 
-component.json: src/component.js queue.js
+.PHONY: all clean test
+
+all: $(GENERATED_FILES)
+
+component.json: bin/component queue.js
 	@rm -f $@
-	node src/component.js > $@
+	bin/component > $@
 	@chmod a-w $@
 
-package.json: src/package.js queue.js
+package.json: bin/package queue.js
 	@rm -f $@
-	node src/package.js > $@
+	bin/package > $@
 	@chmod a-w $@
-
-test: all
-	node_modules/.bin/vows
-	@echo
 
 %.min.js: %.js Makefile
 	@rm -f $@
 	node_modules/.bin/uglifyjs $< -c -m -o $@
 
+test: all
+	@npm test
+
 clean:
-	rm -f queue.min.js component.json package.json
+	rm -f -- $(GENERATED_FILES)
