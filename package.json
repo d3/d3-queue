@@ -1,6 +1,6 @@
 {
   "name": "queue-async",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A little helper for asynchronous JavaScript.",
   "keywords": [
     "asynchronous",
@@ -17,10 +17,10 @@
   },
   "main": "queue.js",
   "devDependencies": {
-    "uglify-js": "~2.2.5",
-    "vows": "~0.7.0"
+    "uglify-js": "2",
+    "vows": "0.7"
   },
   "scripts": {
-    "test": "node_modules/.bin/vows; echo"
+    "test": "vows; echo"
   }
 }

@@ -19,10 +19,10 @@ console.log(JSON.stringify({
   },
   "main": "queue.js",
   "devDependencies": {
-    "uglify-js": "~2.2.5",
-    "vows": "~0.7.0"
+    "uglify-js": "2",
+    "vows": "0.7"
   },
   "scripts": {
-    "test": "node_modules/.bin/vows; echo"
+    "test": "vows; echo"
   }
 }, null, 2));
