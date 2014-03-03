@@ -71,6 +71,27 @@
     };
   }
 
+  queue.then = function(fulfill, reject) {
+    var q = fulfill();
+    return then(function(callback) { callback(q); }, reject);
+  };
+
+  function then(previousFulfill, previousReject) {
+    return {
+      then: function(fulfill, reject) {
+        var nextFulfill = noop;
+        if (!reject) reject = previousReject;
+        previousFulfill(function(q) {
+          q.await(function(error) {
+            if (error) return void reject.call(this, error);
+            nextFulfill(fulfill.apply(this, [].slice.call(arguments, 1)));
+          });
+        });
+        return then(function(callback) { nextFulfill = callback; }, reject);
+      }
+    };
+  }
+
   function noop() {}
 
   queue.version = "1.0.7";
