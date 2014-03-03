@@ -84,13 +84,12 @@
         previous(function(error, q) {
           function resolve(error) {
             try {
-              q = error
+              next(null, error
                   ? reject.call(this, error)
-                  : fulfill.apply(this, [].slice.call(arguments, 1));
-            } catch (e) {
-              error = e;
+                  : fulfill.apply(this, [].slice.call(arguments, 1)));
+            } catch (error) {
+              next(error);
             }
-            next(error, q);
           }
           error ? resolve(error) : q.await(resolve);
         });
