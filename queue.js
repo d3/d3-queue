@@ -73,7 +73,7 @@
 
   queue.then = function(fulfill, reject) {
     var q = fulfill();
-    return then(function(callback) { callback(q); }, reject);
+    return then(function(callback) { callback(q); }, reject || noop);
   };
 
   function then(previousFulfill, previousReject) {
