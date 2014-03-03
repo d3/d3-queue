@@ -71,28 +71,36 @@
     };
   }
 
-  queue.then = function(fulfill, reject) {
+  queue.then = function(fulfill) {
     var q = fulfill();
-    return then(function(callback) { callback(q); }, reject || noop);
+    return then(function(callback) { callback(null, q); });
   };
 
-  function then(previousFulfill, previousReject) {
+  function then(previous) {
     return {
       then: function(fulfill, reject) {
-        var nextFulfill = noop;
-        if (!reject) reject = previousReject;
-        previousFulfill(function(q) {
-          q.await(function(error) {
-            if (error) return void reject.call(this, error);
-            nextFulfill(fulfill.apply(this, [].slice.call(arguments, 1)));
-          });
+        var next = pass;
+        if (!reject) reject = pass;
+        previous(function(error, q) {
+          function resolve(error) {
+            try {
+              q = error
+                  ? reject.call(this, error)
+                  : fulfill.apply(this, [].slice.call(arguments, 1));
+            } catch (e) {
+              error = e;
+            }
+            next(error, q);
+          }
+          error ? resolve(error) : q.await(resolve);
         });
-        return then(function(callback) { nextFulfill = callback; }, reject);
+        return then(function(callback) { next = callback; });
       }
     };
   }
 
   function noop() {}
+  function pass(error) { if (error) throw error; }
 
   queue.version = "1.0.7";
   if (typeof define === "function" && define.amd) define(function() { return queue; });
