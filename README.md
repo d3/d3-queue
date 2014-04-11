@@ -60,7 +60,7 @@ Adds the specified asynchronous *task* function to the queue, with any optional 
 ```js
 function simpleTask(callback) {
   setTimeout(function() {
-    callback(null, {success: true});
+    callback(null, {answer: 42});
   }, 250);
 }
 ```
