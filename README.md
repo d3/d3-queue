@@ -65,7 +65,7 @@ function simpleTask(callback) {
 }
 ```
 
-If an error occurs, any tasks that were scheduled *but not yet started* will not run. For a serial queue (*parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
+If an error occurs, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
 Tasks can only be deferred before the *await* callback is set. If a task is deferred after the await callback is set, the behavior of the queue is undefined.
 
