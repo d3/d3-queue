@@ -55,7 +55,15 @@ Constructs a new queue with the specified *parallelism*. If *parallelism* is not
 
 ### queue.defer(task[, arguments…])
 
-Adds the specified asynchronous *task* function to the queue, with any optional *arguments*. The *task* will be called with the specified optional arguments and an additional callback argument; the callback must then be invoked by the task when it has finished. The task must invoke the callback with two arguments: the error, if any, and the result of the task.
+Adds the specified asynchronous *task* function to the queue, with any optional *arguments*. The *task* will be called with the specified optional arguments and an additional callback argument; the callback must then be invoked by the task when it has finished. The task must invoke the callback with two arguments: the error, if any, and the result of the task. For example:
+
+```js
+function simpleTask(callback) {
+  setTimeout(function() {
+    callback(null, {success: true});
+  }, 250);
+}
+```
 
 If an error occurs, any tasks that were scheduled *but not yet started* will not run. For a serial queue (*parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
