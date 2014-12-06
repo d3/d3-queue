@@ -4,6 +4,15 @@ var queue = require("../queue");
 
 console.log(JSON.stringify({
   "name": "queue-async",
+  "repository": "mbostock/queue",
+  "description": "Yet another asynchronous helper library for JavaScript.",
   "version": queue.version,
-  "main": "./queue.js"
+  "keywords": [
+    "async"
+  ],
+  "main": "queue.js",
+  "scripts": [
+    "queue.js"
+  ],
+  "license": "BSD"
 }, null, 2));
