@@ -23,16 +23,16 @@ Queue.js can be run inside Node.js or in a browser.
 
 ## Installation
 
-In a browser, you can use the official hosted copy on [d3js.org](http://d3js.org):
+In a browser, you can use the official hosted copy on [CDNJS](https://cdnjs.com/):
 
 ```html
-<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
 ```
 
 Queue.js supports the asynchronous module definition (AMD) API. For example, if you use [RequireJS](http://requirejs.org/), you may load as follows:
 
 ```js
-require.config({paths: {queue: "http://d3js.org/queue.v1.min"}});
+require.config({paths: {queue: "https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min"}});
 
 require(["queue"], function(queue) {
   console.log(queue.version);
