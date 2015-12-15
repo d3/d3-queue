@@ -1,26 +1,34 @@
 {
   "name": "queue-async",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "A little helper for asynchronous JavaScript.",
   "keywords": [
     "asynchronous",
     "async",
     "queue"
   ],
+  "homepage": "https://github.com/mbostock/queue",
+  "license": "BSD-3-Clause",
   "author": {
     "name": "Mike Bostock",
     "url": "http://bost.ocks.org/mike"
   },
+  "main": "build/queue.js",
+  "jsnext:main": "index",
   "repository": {
     "type": "git",
     "url": "https://github.com/mbostock/queue.git"
   },
-  "main": "queue.js",
-  "devDependencies": {
-    "uglify-js": "2",
-    "vows": "0.7"
-  },
   "scripts": {
-    "test": "vows; echo"
+    "pretest": "mkdir -p build && node -e 'process.stdout.write(\"import queue from \\\"../index\\\"; queue.version = \\\"\" + require(\"./package.json\").version + \"\\\"; export default queue;\");' > build/bundle.js && rollup -f umd -u queue -n queue -o build/queue.js -- build/bundle.js",
+    "test": "faucet `find test -name '*-test.js'`",
+    "prepublish": "npm run test && uglifyjs build/queue.js -c -m -o build/queue.min.js && rm -f build/queue.zip && zip -j build/queue.zip -- LICENSE README.md build/queue.js build/queue.min.js"
+  },
+  "devDependencies": {
+    "faucet": "0.0",
+    "rollup": "0.20.5",
+    "seedrandom": "2",
+    "tape": "4",
+    "uglify-js": "2"
   }
 }
