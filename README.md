@@ -73,16 +73,16 @@ To return multiple results from a single callback, wrap those results in an obje
 
 If the task calls back with an error, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
-Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) is called. If a task is deferred after the await callback is set, the behavior of the queue is undefined.
+Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) is called. If a task is deferred after then, an error is thrown.
 
 <a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>)
 
 Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If an error occurred, there are no additional arguments to the callback. Otherwise, the *callback* is passed each result as an additional argument.
 
-If all tasks complete before the *await* or *awaitAll* callback is set, the callback will be invoked immediately. This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
+If all [deferred](#queue_defer) tasks have already completed, the callback will be invoked immediately. This method may only be called once, after any tasks have been deferred. If this method is called multiple times, or if it is called after [*queue*.awaitAll](#queue_awaitAll), an error is thrown.
 
 <a href="#queue_awaitAll" name="queue_awaitAll">#</a> <i>queue</i>.<b>awaitAll</b>(<i>callback</i>)
 
 Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If an error occurred, there are no additional arguments to the callback. Otherwise, the *callback* is also passed an array of results as the second argument.
 
-If all tasks complete before the *await* or *awaitAll* callback is set, the callback will be invoked immediately. This method should only be called once, after any tasks have been deferred. If the await callback is set multiple times, or set before a task is deferred, the behavior of the queue is undefined.
+If all [deferred](#queue_defer) tasks have already completed, the callback will be invoked immediately. This method may only be called once, after any tasks have been deferred. If this method is called multiple times, or if it is called after [*queue*.await](#queue_await), an error is thrown.
