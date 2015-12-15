@@ -13,7 +13,7 @@ export default function(parallelism) {
       await = noop,
       all;
 
-  if (!parallelism) parallelism = Infinity;
+  parallelism = parallelism == null ? Infinity : +parallelism;
 
   function pop() {
     while (popping = started < tasks.length && active < parallelism) {
