@@ -29,10 +29,14 @@ In a browser, you can use the official hosted copy on [CDNJS](https://cdnjs.com/
 <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
 ```
 
-Queue supports the asynchronous module definition (AMD) API. For example, if you use [RequireJS](http://requirejs.org/), you may load as follows:
+Queue supports the [universal module definition](https://github.com/umdjs/umd) API. For example, with [RequireJS](http://requirejs.org/):
 
 ```js
-require.config({paths: {queue: "https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min"}});
+require.config({
+  paths: {
+    queue: "https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min"
+  }
+});
 
 require(["queue"], function(queue) {
   console.log(queue.version);
