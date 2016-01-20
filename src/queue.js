@@ -12,7 +12,7 @@ export default function(parallelism) {
       popping, // inside a synchronous task callback?
       error = null,
       callback = noop,
-      all;
+      callbackAll;
 
   parallelism = arguments.length ? +parallelism : Infinity;
 
@@ -53,7 +53,7 @@ export default function(parallelism) {
 
   function notify() {
     if (error != null) callback(error);
-    else if (all) callback(error, tasks);
+    else if (callbackAll) callback(error, tasks);
     else callback.apply(null, [error].concat(tasks));
   }
 
@@ -71,13 +71,13 @@ export default function(parallelism) {
     },
     await: function(f) {
       check();
-      callback = f, all = false;
+      callback = f, callbackAll = false;
       if (!remaining) notify();
       return q;
     },
     awaitAll: function(f) {
       check();
-      callback = f, all = true;
+      callback = f, callbackAll = true;
       if (!remaining) notify();
       return q;
     }
