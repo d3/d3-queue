@@ -100,7 +100,7 @@ tape("a serial queue of asynchronous closures processes tasks serially", functio
   var tasks = [], task = asynchronousTask(), n = 10, q = queue(1);
   while (--n >= 0) tasks.push(task);
   tasks.forEach(function(t) { q.defer(t); });
-  q.awaitAll(callback)
+  q.awaitAll(callback);
 
   function callback(error, results) {
     test.equal(error, null);
