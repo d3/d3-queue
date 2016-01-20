@@ -21,7 +21,7 @@
   },
   "scripts": {
     "pretest": "mkdir -p build && node -e 'process.stdout.write(\"import queue from \\\"../index\\\"; queue.version = \\\"\" + require(\"./package.json\").version + \"\\\"; export default queue;\");' > build/bundle.js && rollup -f umd -u queue -n queue -o build/queue.js -- build/bundle.js",
-    "test": "faucet `find test -name '*-test.js'`",
+    "test": "faucet `find test -name '*-test.js'` && eslint index.js src",
     "prepublish": "npm run test && uglifyjs build/queue.js -c -m -o build/queue.min.js && rm -f build/queue.zip && zip -j build/queue.zip -- LICENSE README.md build/queue.js build/queue.min.js"
   },
   "devDependencies": {
