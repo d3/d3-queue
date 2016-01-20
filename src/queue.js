@@ -1,7 +1,7 @@
 var slice = [].slice,
     running = {};
 
-function unset() {}
+function noop() {}
 
 export default function(parallelism) {
   var q,
@@ -11,7 +11,7 @@ export default function(parallelism) {
       remaining = 0, // number of tasks not yet finished
       popping, // inside a synchronous task callback?
       error = null,
-      await = unset,
+      callback = noop,
       all;
 
   parallelism = arguments.length ? +parallelism : Infinity;
@@ -24,12 +24,12 @@ export default function(parallelism) {
           c = t[j];
       tasks[i] = running;
       ++active;
-      t[j] = callback(i);
+      t[j] = finished(i);
       c.apply(null, t);
     }
   }
 
-  function callback(i) {
+  function finished(i) {
     return function(e, r) {
       if (tasks[i] !== running) throw new Error;
       tasks[i] = null;
@@ -48,13 +48,13 @@ export default function(parallelism) {
   }
 
   function check() {
-    if (await !== unset) throw new Error;
+    if (callback !== noop) throw new Error;
   }
 
   function notify() {
-    if (error != null) await(error);
-    else if (all) await(error, tasks);
-    else await.apply(null, [error].concat(tasks));
+    if (error != null) callback(error);
+    else if (all) callback(error, tasks);
+    else callback.apply(null, [error].concat(tasks));
   }
 
   return q = {
@@ -71,13 +71,13 @@ export default function(parallelism) {
     },
     await: function(f) {
       check();
-      await = f, all = false;
+      callback = f, all = false;
       if (!remaining) notify();
       return q;
     },
     awaitAll: function(f) {
       check();
-      await = f, all = true;
+      callback = f, all = true;
       if (!remaining) notify();
       return q;
     }
