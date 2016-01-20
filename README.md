@@ -23,10 +23,10 @@ Queue can be run inside Node.js or in a browser.
 
 ## Installation
 
-In a browser, you can use the official hosted copy on [CDNJS](https://cdnjs.com/):
+In a browser, you can use the official hosted copy on [d3js.org](http://d3js.org):
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+<script src="https://d3js.org/queue.v1.min.js"></script>
 ```
 
 Queue supports the [universal module definition](https://github.com/umdjs/umd) API. For example, with [RequireJS](http://requirejs.org/):
@@ -34,7 +34,7 @@ Queue supports the [universal module definition](https://github.com/umdjs/umd) A
 ```js
 require.config({
   paths: {
-    queue: "https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min"
+    queue: "https://d3js.org/queue.v1.min"
   }
 });
 
