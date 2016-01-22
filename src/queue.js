@@ -1,7 +1,7 @@
 import {slice} from "./array";
 import noop from "./noop";
 
-var running = {},
+var noabort = {},
     success = [null];
 
 function newQueue(parallelism) {
@@ -25,16 +25,15 @@ function newQueue(parallelism) {
           t = tasks[i],
           j = t.length - 1,
           c = t[j];
-      results[i] = running, --waiting, ++active;
       t[j] = end(i);
-      tasks[i] = c.apply(null, t);
+      --waiting, ++active, tasks[i] = c.apply(null, t) || noabort;
     }
   }
 
   function end(i) {
     return function(e, r) {
-      if (results[i] !== running) throw new Error; // detect multiple callbacks
-      results[i] = null, --active, ++ended;
+      if (!tasks[i]) throw new Error; // detect multiple callbacks
+      --active, ++ended, tasks[i] = null;
       if (error != null) return; // only report the first error
       if (e != null) {
         abort(e);
@@ -63,7 +62,7 @@ function newQueue(parallelism) {
       if (callback !== noop) throw new Error;
       var t = slice.call(arguments, 1);
       t.push(f);
-      tasks.push(t), ++waiting;
+      ++waiting, tasks.push(t);
       start();
       return q;
     },
