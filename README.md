@@ -1,6 +1,6 @@
 # Queue
 
-**Queue.js** is a library for asynchronous JavaScript that strives for minimalism. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that does not use code generation.
+**Queue.js** is a library for asynchronous JavaScript that strives for minimalism. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that provides `await` and `defer` without the code generation.
 
 Say you want to stat two files in parallel:
 
