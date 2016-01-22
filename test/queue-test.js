@@ -377,7 +377,7 @@ tape("a falsey error is still considered an error", function(test) {
       .await(function(error) { test.equal(error, 0); test.end(); });
 });
 
-tape("aborts a queue of asynchronous tasks", function(test) {
+tape("aborts a queue of partially-completed asynchronous tasks", function(test) {
   var shortTask = abortableTask(50),
       longTask = abortableTask(5000);
 
@@ -398,10 +398,33 @@ tape("aborts a queue of asynchronous tasks", function(test) {
     q.abort();
   }, 250);
 
-  function callback(error, results, n1, n2) {
+  function callback(error, results) {
     test.equal(error.message, "abort");
     test.equal(results, undefined);
     test.equal(shortTask.aborted(), 0);
+    test.equal(longTask.aborted(), 5);
+    test.end();
+  }
+});
+
+tape("aborts an entire queue of asynchronous tasks", function(test) {
+  var longTask = abortableTask(5000);
+
+  var q = queue()
+      .defer(longTask)
+      .defer(longTask)
+      .defer(longTask)
+      .defer(longTask)
+      .defer(longTask)
+      .awaitAll(callback);
+
+  setTimeout(function() {
+    q.abort();
+  }, 250);
+
+  function callback(error, results) {
+    test.equal(error.message, "abort");
+    test.equal(results, undefined);
     test.equal(longTask.aborted(), 5);
     test.end();
   }

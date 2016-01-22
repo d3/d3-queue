@@ -69,7 +69,7 @@ function newQueue(parallelism) {
     abort: function() {
       if (error == null) {
         var i = ended + active, t;
-        while (--i) (t = tasks[i]) && t.abort && t.abort();
+        while (--i >= 0) (t = tasks[i]) && t.abort && t.abort();
         abort(new Error("abort"));
       }
       return q;
