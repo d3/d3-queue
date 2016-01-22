@@ -2,7 +2,7 @@
 
 **Queue.js** is a library for asynchronous JavaScript that strives for minimalism. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that does not use code generation.
 
-Say you wanted to stat two files in parallel:
+Say you want to stat two files in parallel:
 
 ```js
 queue()
@@ -11,12 +11,19 @@ queue()
     .await(function(error, file1, file2) { console.log(file1, file2); });
 ```
 
-Or say you wanted to run a bazillion asynchronous tasks, here represented as an array of closures, serially:
+Or say you want to run a bazillion asynchronous tasks, here represented as an array of closures, serially:
 
 ```js
 var q = queue(1);
-tasks.forEach(function(t) { q.defer(t); });
-q.awaitAll(function(error, results) { console.log("all done!"); });
+
+tasks.forEach(function(t) {
+  q.defer(t);
+});
+
+q.awaitAll(function(error, results) {
+  if (error) throw error;
+  console.log("all done!");
+});
 ```
 
 Queue can be run inside Node.js or in a browser.
