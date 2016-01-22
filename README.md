@@ -66,7 +66,7 @@ queue()
     });
 ```
 
-The [asynchronous callback pattern](https://github.com/maxogden/art-of-node#callbacks) is very common in Node.js, so Queue works directly with many Node API’s. For example, to stat two files in parallel:
+The [asynchronous callback pattern](https://github.com/maxogden/art-of-node#callbacks) is very common in Node.js, so Queue works directly with many Node APIs. For example, to stat two files in parallel:
 
 ```js
 queue()
