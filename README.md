@@ -141,26 +141,11 @@ function simpleTask(callback) {
 
 If the task calls back with an error, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
-The *task* function may return an object with an abort method. This enables [*queue*.abort](#queue_abort) to abort any active tasks. For example:
-
-```js
-function simpleTask(callback) {
-  var id = setTimeout(function() {
-    callback(null, {answer: 42});
-  }, 250);
-  return {
-    abort: function() {
-      clearTimeout(id);
-    }
-  };
-}
-```
-
 Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) is called. If a task is deferred after then, an error is thrown.
 
 <a href="#queue_abort" name="queue_abort">#</a> <i>queue</i>.<b>abort</b>()
 
-Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted. See [*queue*.defer](#queue_defer) for an example of implementing *task*.abort.
+Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted.
 
 <a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>)
 
