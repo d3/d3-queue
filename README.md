@@ -2,7 +2,7 @@
 
 **Queue.js** is a minimalist library for escaping callback hell in asynchronous JavaScript. As of release 1.2, Queue is 560 bytes gzipped. (Compare that to [Async.js](https://github.com/caolan/async), which is 4,300!)
 
-A queue evaluates zero or more asynchronous tasks with tunable parallelism. Each task is a function that takes a callback as its last argument. For example, here’s a task that prints “hello” after a short delay:
+A queue evaluates zero or more asynchronous tasks with tunable parallelism. Each task is a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
 
 ```js
 function delayedHello(callback) {
@@ -42,7 +42,7 @@ q.awaitAll(function(error) {
 });
 ```
 
-Tasks can take optional arguments. For example, here’s how to configure the delay before “hello”, and also provide a name:
+Tasks can take optional arguments. For example, here’s how to configure the delay before hello and provide a name:
 
 ```js
 function delayedHello(name, delay, callback) {
