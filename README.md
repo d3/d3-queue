@@ -1,6 +1,6 @@
 # Queue
 
-**Queue.js** is a minimalist library for escaping callback hell in asynchronous JavaScript. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning of parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that provides `await` and `defer` without the code generation.
+**Queue.js** is a minimalist library for escaping callback hell in asynchronous JavaScript. As of release 1.2, Queue is 560 bytes gzipped. (Compare that to [Async.js](https://github.com/caolan/async), which is 4,300.)
 
 A queue consists of zero or more asynchronous tasks. Each task is a function that takes a callback as its last argument. For example, this task prints “hello” after a quarter-second:
 
