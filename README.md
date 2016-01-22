@@ -53,7 +53,7 @@ function delayedHello(name, delay, callback) {
 }
 ```
 
-Any additional arguments provided to [*queue*.defer](#queue_defer) are automatically passed along to the task function, before the callback argument. You can also use method chaining for conciseness:
+Any additional arguments provided to [*queue*.defer](#queue_defer) are automatically passed along to the task function before the callback argument. You can also use method chaining for conciseness, avoiding the need for a local variable:
 
 ```js
 queue()
