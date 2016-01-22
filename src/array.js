@@ -1,1 +1,1 @@
-export var slice = Array.prototype.slice;
+export var slice = [].slice;
