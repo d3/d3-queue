@@ -26,6 +26,13 @@ tape("example queue of fs.stat", function(test) {
   }
 });
 
+tape("if the parallelism is invalid, an Error is thrown", function(test) {
+  test.throws(function() { queue(NaN); }, /Error/);
+  test.throws(function() { queue(0); }, /Error/);
+  test.throws(function() { queue(-1); }, /Error/);
+  test.end();
+});
+
 tape("in a queue of a single synchronous task that errors, the error is returned", function(test) {
   queue()
       .defer(function(callback) { callback(-1); })

@@ -1,9 +1,11 @@
-var slice = [].slice,
-    running = {};
+import {slice} from "./array";
+import noop from "./noop";
 
-function noop() {}
+var running = {};
 
-export default function(parallelism) {
+function newQueue(parallelism) {
+  if (!(parallelism >= 1)) throw new Error;
+
   var q,
       tasks = [],
       started = 0, // number of tasks that have been started (and perhaps finished)
@@ -13,8 +15,6 @@ export default function(parallelism) {
       error = null,
       callback = noop,
       callbackAll = true;
-
-  parallelism = arguments.length ? +parallelism : Infinity;
 
   function pop() {
     while (popping = started < tasks.length && active < parallelism) {
@@ -47,10 +47,6 @@ export default function(parallelism) {
     };
   }
 
-  function check() {
-    if (callback !== noop) throw new Error;
-  }
-
   function notify() {
     if (error != null) callback(error);
     else if (callbackAll) callback(error, tasks);
@@ -59,7 +55,7 @@ export default function(parallelism) {
 
   return q = {
     defer: function(f) {
-      check();
+      if (callback !== noop) throw new Error;
       if (!error) {
         var t = slice.call(arguments, 1);
         t.push(f);
@@ -70,16 +66,20 @@ export default function(parallelism) {
       return q;
     },
     await: function(f) {
-      check();
+      if (callback !== noop) throw new Error;
       callback = f, callbackAll = false;
       if (!remaining) notify();
       return q;
     },
     awaitAll: function(f) {
-      check();
+      if (callback !== noop) throw new Error;
       callback = f, callbackAll = true;
       if (!remaining) notify();
       return q;
     }
   };
+}
+
+export default function(parallelism) {
+  return newQueue(arguments.length ? +parallelism : Infinity);
 }
