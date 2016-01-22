@@ -342,3 +342,36 @@ tape("a huge queue of deferred synchronous tasks does not throw a RangeError", f
     test.end();
   }
 });
+
+tape("a task that calls back successfully more than once throws an Error", function(test) {
+  queue().defer(function(callback) {
+    callback(null);
+    test.throws(function() { callback(null); }, /Error/);
+    test.end();
+  });
+});
+
+tape("a task that calls back with an error more than once throws an Error", function(test) {
+  queue().defer(function(callback) {
+    callback(new Error);
+    test.throws(function() { callback(new Error); }, /Error/);
+    test.end();
+  });
+});
+
+tape("a task that defers another task is allowed", function(test) {
+  var q = queue();
+  q.defer(function(callback) {
+    callback(null);
+    q.defer(function(callback) {
+      test.end();
+    });
+  });
+});
+
+tape("a falsey error is still considered an error", function(test) {
+  queue()
+      .defer(function(callback) { callback(0); })
+      .defer(function() { throw new Error; })
+      .await(function(error) { test.equal(error, 0); test.end(); });
+});
