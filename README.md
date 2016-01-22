@@ -78,7 +78,7 @@ queue()
     });
 ```
 
-Lastly, you can also make abortable tasks. These tasks return an object with an *abort* method which terminates the task. For example:
+You can also make abortable tasks: these tasks return an object with an *abort* method which terminates the task. So, if a task calls [setTimeout](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout) on start, it can call [clearTimeout](https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/clearTimeout) on abort. For example:
 
 ```js
 function delayedHello(name, delay, callback) {
@@ -94,7 +94,7 @@ function delayedHello(name, delay, callback) {
 }
 ```
 
-Now if you call [*queue*.abort](#queue_abort), any in-progress tasks will be immediately terminated; in addition, any pending (not-yet-started) tasks not be executed. You can also use *queue*.abort without abortable tasks, in which case active tasks will continue running while pending tasks are cancelled. The [d3-request](https://github.com/d3/d3-request) implements the abort method on top of XMLHttpRequest. For example:
+When you call [*queue*.abort](#queue_abort), any in-progress tasks will be immediately aborted; in addition, any pending (not-yet-started) tasks not be started. Note that you can also use *queue*.abort *without* abortable tasks, in which case pending tasks will be cancelled, though active tasks will continue to run. The [d3-request](https://github.com/d3/d3-request) library implements the abort method on top of XMLHttpRequest. For example:
 
 ```js
 var q = queue()
