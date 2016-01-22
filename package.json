@@ -1,7 +1,7 @@
 {
   "name": "queue-async",
   "version": "1.2.0",
-  "description": "A minimalist library for asynchronous JavaScript.",
+  "description": "A minimalist library for escaping callback hell.",
   "keywords": [
     "asynchronous",
     "async",

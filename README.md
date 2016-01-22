@@ -1,4 +1,4 @@
-# Queue
+# Queue.js
 
 **Queue.js** is a minimalist library for escaping callback hell in asynchronous JavaScript. As of release 1.2, Queue is 560 bytes gzipped. (Compare that to [Async.js](https://github.com/caolan/async), which is 4,300!)
 
@@ -145,7 +145,7 @@ Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awai
 
 <a href="#queue_abort" name="queue_abort">#</a> <i>queue</i>.<b>abort</b>()
 
-Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted.
+Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted. See the [introduction](#queue.js) for an example implementation of an abortable task.
 
 <a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>)
 
