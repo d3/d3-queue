@@ -1,6 +1,6 @@
 # Queue
 
-**Queue.js** is a library for asynchronous JavaScript that strives for minimalism. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that provides `await` and `defer` without the code generation.
+**Queue.js** is a minimalist library for asynchronous JavaScript. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that provides `await` and `defer` without the code generation.
 
 A queue consists of zero or more asynchronous tasks. Each task is a function that takes a callback as its last argument. For example, this task prints “hello” after a quarter-second:
 
@@ -94,37 +94,30 @@ function delayedHello(name, delay, callback) {
 }
 ```
 
-Now if you call [*queue*.abort](#queue_abort), any in-progress tasks will be immediately terminated; in addition, any pending (not-yet-started) tasks not be executed. You can also use *queue*.abort without abortable tasks, in which case active tasks will continue running while pending tasks are cancelled.
+Now if you call [*queue*.abort](#queue_abort), any in-progress tasks will be immediately terminated; in addition, any pending (not-yet-started) tasks not be executed. You can also use *queue*.abort without abortable tasks, in which case active tasks will continue running while pending tasks are cancelled. The [d3-request](https://github.com/d3/d3-request) implements the abort method on top of XMLHttpRequest. For example:
+
+```js
+var q = queue()
+    .defer(d3.request, "http://www.google.com:81")
+    .defer(d3.request, "http://www.google.com:81")
+    .defer(d3.request, "http://www.google.com:81")
+    .awaitAll(function(error, results) {
+      if (error) throw error;
+      console.log(results);
+    });
+```
+
+To abort these requests, call `q.abort()`.
 
 ## Installation
 
-In a browser, you can use the official hosted copy on [d3js.org](http://d3js.org):
+If you use NPM, `npm install queue-async`. Otherwise, download the [latest release](https://github.com/mbostock/queue/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3js.org](https://d3js.org):
 
 ```html
 <script src="https://d3js.org/queue.v1.min.js"></script>
 ```
 
-Queue supports the [universal module definition](https://github.com/umdjs/umd) API. For example, with [RequireJS](http://requirejs.org/):
-
-```js
-require.config({
-  paths: {
-    queue: "https://d3js.org/queue.v1.min"
-  }
-});
-
-require(["queue"], function(queue) {
-  console.log(queue.version);
-});
-```
-
-In Node, use [NPM](http://npmjs.org) to install:
-
-```bash
-npm install queue-async
-```
-
-And then `require("queue-async")`.
+In a vanilla environment, a `queue` global function is exported. [Try queue in your browser.](https://tonicdev.com/npm/queue-async)
 
 ## API Reference
 
@@ -167,20 +160,7 @@ Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awai
 
 <a href="#queue_abort" name="queue_abort">#</a> <i>queue</i>.<b>abort</b>()
 
-Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted. For example, consider the following queue using [d3-request](https://github.com/d3/d3-request):
-
-```js
-var q = queue()
-    .defer(d3.request, "http://www.google.com:81")
-    .defer(d3.request, "http://www.google.com:81")
-    .defer(d3.request, "http://www.google.com:81")
-    .awaitAll(function(error, results) {
-      if (error) throw error;
-      console.log(results);
-    });
-```
-
-To abort these requests, call `q.abort()`.
+Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted. See [*queue*.defer](#queue_defer) for an example of implementing *task*.abort.
 
 <a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>)
 
