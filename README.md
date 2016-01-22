@@ -1,8 +1,8 @@
 # Queue
 
-**Queue.js** is yet another asynchronous helper library for JavaScript. Think of Queue as a minimalist version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism. Or, think of it as a version of [TameJs](https://github.com/maxtaco/tamejs/) that does not use code generation.
+**Queue.js** is a library for asynchronous JavaScript that strives for minimalism. Think of Queue as a tiny version of [Async.js](https://github.com/caolan/async) that allows fine-tuning over parallelism; as of release 1.2, Queue is 560 bytes gzipped while Async.js is 4,300! Or, think of Queue as a version of [TameJs](https://github.com/maxtaco/tamejs/) that does not use code generation.
 
-For example, if you wanted to stat two files in parallel:
+Say you wanted to stat two files in parallel:
 
 ```js
 queue()
@@ -11,7 +11,7 @@ queue()
     .await(function(error, file1, file2) { console.log(file1, file2); });
 ```
 
-Or, if you wanted to run a bazillion asynchronous tasks (here represented as an array of closures) serially:
+Or say you wanted to run a bazillion asynchronous tasks, here represented as an array of closures, serially:
 
 ```js
 var q = queue(1);
@@ -49,7 +49,7 @@ In Node, use [NPM](http://npmjs.org) to install:
 npm install queue-async
 ```
 
-And then `require("queue-async")`. (The package name is [queue-async](https://npmjs.org/package/queue-async) because the name “queue” was already taken.)
+And then `require("queue-async")`.
 
 ## API Reference
 
@@ -73,7 +73,39 @@ To return multiple results from a single callback, wrap those results in an obje
 
 If the task calls back with an error, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
+The *task* function can return an abort with an abort method, such that [*queue*.abort](#queue_abort) can abort any active tasks. For example:
+
+```js
+function simpleTask(callback) {
+  var id = setTimeout(function() {
+    callback(null, {answer: 42});
+  }, 250);
+  return {
+    abort: function() {
+      clearTimeout(id);
+    }
+  };
+}
+```
+
 Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) is called. If a task is deferred after then, an error is thrown.
+
+<a href="#queue_abort" name="queue_abort">#</a> <i>queue</i>.<b>abort</b>()
+
+Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted. For example, consider the following queue using [d3-request](https://github.com/d3/d3-request):
+
+```js
+var q = queue()
+    .defer(d3.request, "http://www.google.com:81")
+    .defer(d3.request, "http://www.google.com:81")
+    .defer(d3.request, "http://www.google.com:81")
+    .awaitAll(function(error, results) {
+      if (error) throw error;
+      console.log(results);
+    });
+```
+
+To abort these requests, call `q.abort()`.
 
 <a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>)
 

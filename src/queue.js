@@ -1,7 +1,7 @@
 import {slice} from "./array";
 import noop from "./noop";
 
-var running = {},
+var noabort = {},
     success = [null];
 
 function newQueue(parallelism) {
@@ -9,6 +9,7 @@ function newQueue(parallelism) {
 
   var q,
       tasks = [],
+      results = [],
       waiting = 0,
       active = 0,
       ended = 0,
@@ -24,33 +25,36 @@ function newQueue(parallelism) {
           t = tasks[i],
           j = t.length - 1,
           c = t[j];
-      tasks[i] = running, --waiting, ++active;
       t[j] = end(i);
-      c.apply(null, t);
+      --waiting, ++active, tasks[i] = c.apply(null, t) || noabort;
     }
   }
 
   function end(i) {
     return function(e, r) {
-      if (tasks[i] !== running) throw new Error; // detect multiple callbacks
-      tasks[i] = null, --active, ++ended;
+      if (!tasks[i]) throw new Error; // detect multiple callbacks
+      --active, ++ended, tasks[i] = null;
       if (error != null) return; // only report the first error
       if (e != null) {
-        error = e; // ignore new tasks and squelch active callbacks
-        waiting = NaN; // stop queued tasks from starting
-        notify();
+        abort(e);
       } else {
-        tasks[i] = r;
+        results[i] = r;
         if (waiting) start();
         else if (!active) notify();
       }
     };
   }
 
+  function abort(e) {
+    error = e; // ignore new tasks and squelch active callbacks
+    waiting = NaN; // stop queued tasks from starting
+    notify();
+  }
+
   function notify() {
     if (error != null) callback(error);
-    else if (callbackAll) callback(null, tasks);
-    else callback.apply(null, success.concat(tasks));
+    else if (callbackAll) callback(null, results);
+    else callback.apply(null, success.concat(results));
   }
 
   return q = {
@@ -58,8 +62,16 @@ function newQueue(parallelism) {
       if (callback !== noop) throw new Error;
       var t = slice.call(arguments, 1);
       t.push(f);
-      tasks.push(t), ++waiting;
+      ++waiting, tasks.push(t);
       start();
+      return q;
+    },
+    abort: function() {
+      if (error == null) {
+        var i = ended + active, t;
+        while (--i >= 0) (t = tasks[i]) && t.abort && t.abort();
+        abort(new Error("abort"));
+      }
       return q;
     },
     await: function(f) {

@@ -1,7 +1,7 @@
 {
   "name": "queue-async",
-  "version": "1.1.1",
-  "description": "A little helper for asynchronous JavaScript.",
+  "version": "1.2.0",
+  "description": "A minimalist library for asynchronous JavaScript.",
   "keywords": [
     "asynchronous",
     "async",
