@@ -318,3 +318,20 @@ tape("a serialized queue of ten synchronous tasks executes all tasks in series",
     test.end();
   }
 });
+
+tape("a huge queue of deferred synchronous tasks does not throw a RangeError", function(test) {
+  var t = deferredSynchronousTask(),
+      q = queue(),
+      n = 200000;
+
+  for (var i = 0; i < n; ++i) q.defer(t);
+
+  t.finish();
+  q.awaitAll(callback);
+
+  function callback(error, results) {
+    test.equal(null, error);
+    test.equal(results.length, n);
+    test.end();
+  }
+});

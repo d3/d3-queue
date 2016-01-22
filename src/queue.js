@@ -12,7 +12,7 @@ export default function(parallelism) {
       popping, // inside a synchronous task callback?
       error = null,
       callback = noop,
-      callbackAll;
+      callbackAll = true;
 
   parallelism = arguments.length ? +parallelism : Infinity;
 
