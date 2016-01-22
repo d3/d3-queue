@@ -127,7 +127,9 @@ Constructs a new queue with the specified *parallelism*. If *parallelism* is not
 
 <a href="#queue_defer" name="queue_defer">#</a> <i>queue</i>.<b>defer</b>(<i>task</i>[, <i>arguments</i>…])
 
-Adds the specified asynchronous *task* callback to the queue, with any optional *arguments*. The *task* will be called with the specified optional arguments and an additional callback argument; the callback must then be invoked by the task when it has finished. The task must invoke the callback with two arguments: the error, if any, and the result of the task. For example:
+Adds the specified asynchronous *task* callback to the queue, with any optional *arguments*. The *task* will be called with the specified optional arguments and an additional callback argument; the callback must then be invoked by the task when it has finished. The task must invoke the callback with two arguments: the error, if any, and the result of the task.
+
+For example, here’s a task which computes the answer to the ultimate question of life, the universe, and everything after a short delay:
 
 ```js
 function simpleTask(callback) {
