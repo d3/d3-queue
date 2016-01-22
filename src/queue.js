@@ -63,7 +63,7 @@ function newQueue(parallelism) {
       if (callback !== noop) throw new Error;
       var t = slice.call(arguments, 1);
       t.push(f);
-      results.length = tasks.push(t), ++waiting;
+      tasks.push(t), ++waiting;
       start();
       return q;
     },
