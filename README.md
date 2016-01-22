@@ -15,7 +15,7 @@ function delayedHello(callback) {
 
 When a task completes, it must call the provided callback. The first argument to the callback should be null if the task is successfull, or the error if the task failed. The optional second argument to the callback is the return value of the task. (To return multiple values from a single callback, wrap the results in an object or array.)
 
-To run multiple tasks in parallel, create a queue and register an *await* callback to be called when all of the tasks have completed (or an error occurs):
+To run multiple tasks in parallel, create a queue, *defer* your tasks, and then register an *await* callback to be called when all of the tasks complete (or an error occurs):
 
 ```js
 var q = queue();
