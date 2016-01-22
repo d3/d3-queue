@@ -8,7 +8,10 @@ Say you want to stat two files in parallel:
 queue()
     .defer(fs.stat, __dirname + "/../Makefile")
     .defer(fs.stat, __dirname + "/../package.json")
-    .await(function(error, file1, file2) { console.log(file1, file2); });
+    .await(function(error, file1, file2) {
+      if (error) throw error;
+      console.log(file1, file2);
+    });
 ```
 
 Or say you want to run a bazillion asynchronous tasks, here represented as an array of closures, serially:
