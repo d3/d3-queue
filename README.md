@@ -14,7 +14,7 @@ queue()
     });
 ```
 
-Or say you want to run a bazillion asynchronous tasks, here represented as an array of closures, serially:
+Say you want to run a bazillion asynchronous tasks, here represented as an array of closures, serially:
 
 ```js
 var q = queue(1);
