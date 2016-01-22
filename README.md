@@ -127,7 +127,7 @@ Constructs a new queue with the specified *parallelism*. If *parallelism* is not
 
 <a href="#queue_defer" name="queue_defer">#</a> <i>queue</i>.<b>defer</b>(<i>task</i>[, <i>arguments</i>…])
 
-Adds the specified asynchronous *task* callback to the queue, with any optional *arguments*. The *task* will be called with the specified optional arguments and an additional callback argument; the callback must then be invoked by the task when it has finished. The task must invoke the callback with two arguments: the error, if any, and the result of the task.
+Adds the specified asynchronous *task* callback to the queue, with any optional *arguments*. The *task* will be called with the specified optional arguments and an additional callback argument; the callback must then be invoked by the task when it has finished. The task must invoke the callback with two arguments: the error, if any, and the result of the task. To return multiple results from a single callback, wrap the results in an object or array.
 
 For example, here’s a task which computes the answer to the ultimate question of life, the universe, and everything after a short delay:
 
@@ -139,11 +139,9 @@ function simpleTask(callback) {
 }
 ```
 
-To return multiple results from a single callback, wrap those results in an object or array.
-
 If the task calls back with an error, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
-The *task* function can return an abort with an abort method, such that [*queue*.abort](#queue_abort) can abort any active tasks. For example:
+The *task* function may return an object with an abort method. This enables [*queue*.abort](#queue_abort) to abort any active tasks. For example:
 
 ```js
 function simpleTask(callback) {
