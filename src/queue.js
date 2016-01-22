@@ -73,6 +73,15 @@ function newQueue(parallelism) {
       callback = f, callbackAll = true;
       if (!waiting && !active) notify();
       return q;
+    },
+    status: function() {
+      return error == null ? {
+        waiting: waiting,
+        active: active,
+        ended: ended
+      } : {
+        error: error
+      };
     }
   };
 }
