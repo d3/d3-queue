@@ -1,6 +1,4 @@
-# Queue.js
-
-**Queue.js** is a minimalist library for escaping callback hell in asynchronous JavaScript. As of release 1.2, Queue is 560 bytes gzipped. (Compare that to [Async.js](https://github.com/caolan/async), which is 4,300!)
+Queues are a minimalist approach to escaping callback hell in JavaScript. As of release 1.2, d3-queue is 566 bytes gzipped. Compare that to [Async.js](https://github.com/caolan/async), which is 4,300!
 
 A queue evaluates zero or more asynchronous tasks with configurable concurrency. Each task is a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
 
@@ -111,13 +109,13 @@ To abort these requests, call `q.abort()`.
 
 ## Installation
 
-If you use NPM, `npm install queue-async`. Otherwise, download the [latest release](https://github.com/mbostock/queue/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3js.org](https://d3js.org):
+If you use NPM, `npm install d3-queue`. Otherwise, download the [latest release](https://github.com/d3/d3-queue/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3js.org](https://d3js.org):
 
 ```html
 <script src="https://d3js.org/queue.v1.min.js"></script>
 ```
 
-In a vanilla environment, a `queue` global function is exported. [Try queue in your browser.](https://tonicdev.com/npm/queue-async)
+In a vanilla environment, a `queue` global function is exported. [Try d3-queue in your browser.](https://tonicdev.com/npm/d3-queue)
 
 ## API Reference
 

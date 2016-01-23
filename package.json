@@ -1,13 +1,14 @@
 {
-  "name": "queue-async",
+  "name": "d3-queue",
   "version": "1.2.0",
-  "description": "A minimalist library for escaping callback hell.",
+  "description": "A minimalist approach to escaping callback hell.",
   "keywords": [
+    "d3",
     "asynchronous",
     "async",
     "queue"
   ],
-  "homepage": "https://github.com/mbostock/queue",
+  "homepage": "https://github.com/d3/d3-queue",
   "license": "BSD-3-Clause",
   "author": {
     "name": "Mike Bostock",
@@ -17,7 +18,7 @@
   "jsnext:main": "index",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mbostock/queue.git"
+    "url": "https://github.com/d3/d3-queue.git"
   },
   "scripts": {
     "pretest": "mkdir -p build && node -e 'process.stdout.write(\"import queue from \\\"../index\\\"; queue.version = \\\"\" + require(\"./package.json\").version + \"\\\"; export default queue;\");' > build/bundle.js && rollup -f umd -u queue -n queue -o build/queue.js -- build/bundle.js",
