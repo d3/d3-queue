@@ -51,8 +51,10 @@ function newQueue(concurrency) {
   }
 
   function abort(e) {
+    var i = ended + active, t;
     error = e; // ignore new tasks and squelch active callbacks
     waiting = active = NaN; // prevent starting and allow notification
+    while (--i >= 0) if ((t = tasks[i]) && t.abort) t.abort();
     notify();
   }
 
@@ -72,11 +74,7 @@ function newQueue(concurrency) {
       return q;
     },
     abort: function() {
-      if (error == null) {
-        var i = ended + active, t;
-        while (--i >= 0) (t = tasks[i]) && t.abort && t.abort();
-        abort(new Error("abort"));
-      }
+      if (error == null) abort(new Error("abort"));
       return q;
     },
     await: function(f) {
