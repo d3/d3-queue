@@ -2,7 +2,7 @@
 
 **Queue.js** is a minimalist library for escaping callback hell in asynchronous JavaScript. As of release 1.2, Queue is 560 bytes gzipped. (Compare that to [Async.js](https://github.com/caolan/async), which is 4,300!)
 
-A queue evaluates zero or more asynchronous tasks with tunable parallelism. Each task is a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
+A queue evaluates zero or more asynchronous tasks with configurable concurrency. Each task is a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
 
 ```js
 function delayedHello(callback) {
@@ -15,7 +15,7 @@ function delayedHello(callback) {
 
 When a task completes, it must call the provided callback. The first argument to the callback should be null if the task is successfull, or the error if the task failed. The optional second argument to the callback is the return value of the task. (To return multiple values from a single callback, wrap the results in an object or array.)
 
-To run multiple tasks in parallel, create a queue, *defer* your tasks, and then register an *await* callback to be called when all of the tasks complete (or an error occurs):
+To run multiple tasks simultaneously, create a queue, *defer* your tasks, and then register an *await* callback to be called when all of the tasks complete (or an error occurs):
 
 ```js
 var q = queue();
@@ -66,7 +66,7 @@ queue()
     });
 ```
 
-The [asynchronous callback pattern](https://github.com/maxogden/art-of-node#callbacks) is very common in Node.js, so Queue works directly with many Node APIs. For example, to [stat two files](https://nodejs.org/dist/latest/docs/api/fs.html#fs_fs_stat_path_callback) in parallel:
+The [asynchronous callback pattern](https://github.com/maxogden/art-of-node#callbacks) is very common in Node.js, so Queue works directly with many Node APIs. For example, to [stat two files](https://nodejs.org/dist/latest/docs/api/fs.html#fs_fs_stat_path_callback) concurrently:
 
 ```js
 queue()
@@ -121,9 +121,9 @@ In a vanilla environment, a `queue` global function is exported. [Try queue in y
 
 ## API Reference
 
-<a href="#queue" name="queue">#</a> <b>queue</b>([<i>parallelism</i>])
+<a href="#queue" name="queue">#</a> <b>queue</b>([<i>concurrency</i>])
 
-Constructs a new queue with the specified *parallelism*. If *parallelism* is not specified, the queue has infinite parallelism. Otherwise, *parallelism* is a positive integer. For example, if *parallelism* is 1, then all tasks will be run in series. If *parallelism* is 3, then at most three tasks will be allowed to proceed concurrently; this is useful, for example, when loading resources in a web browser.
+Constructs a new queue with the specified *concurrency*. If *concurrency* is not specified, the queue has infinite concurrency. Otherwise, *concurrency* is a positive integer. For example, if *concurrency* is 1, then all tasks will be run in series. If *concurrency* is 3, then at most three tasks will be allowed to proceed concurrently; this is useful, for example, when loading resources in a web browser.
 
 <a href="#queue_defer" name="queue_defer">#</a> <i>queue</i>.<b>defer</b>(<i>task</i>[, <i>arguments</i>…])
 
@@ -139,7 +139,7 @@ function simpleTask(callback) {
 }
 ```
 
-If the task calls back with an error, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *parallelism* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher parallelism, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
+If the task calls back with an error, any tasks that were scheduled *but not yet started* will not run. For a serial queue (of *concurrency* 1), this means that a task will only run if all previous tasks succeed. For a queue with higher concurrency, only the first error that occurs is reported to the await callback, and tasks that were started before the error occurred will continue to run; note, however, that their results will not be reported to the await callback.
 
 Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) is called. If a task is deferred after then, an error is thrown.
 

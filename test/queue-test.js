@@ -27,7 +27,7 @@ tape("example queue of fs.stat", function(test) {
   }
 });
 
-tape("if the parallelism is invalid, an Error is thrown", function(test) {
+tape("if the concurrency is invalid, an Error is thrown", function(test) {
   test.throws(function() { queue(NaN); }, /Error/);
   test.throws(function() { queue(0); }, /Error/);
   test.throws(function() { queue(-1); }, /Error/);
@@ -128,7 +128,7 @@ tape("a serial queue of asynchronous closures processes tasks serially", functio
   }
 });
 
-tape("a fully-parallel queue of ten asynchronous tasks executes all tasks in parallel", function(test) {
+tape("a fully-concurrent queue of ten asynchronous tasks executes all tasks concurrently", function(test) {
   var t = asynchronousTask();
   queue()
       .defer(t)
@@ -161,7 +161,7 @@ tape("a fully-parallel queue of ten asynchronous tasks executes all tasks in par
   }
 });
 
-tape("a partly-parallel queue of ten asynchronous tasks executes at most three tasks in parallel", function(test) {
+tape("a partly-concurrent queue of ten asynchronous tasks executes at most three tasks concurrently", function(test) {
   var t = asynchronousTask();
   queue(3)
       .defer(t)
@@ -261,7 +261,7 @@ tape("a serialized queue of ten deferred synchronous tasks executes all tasks in
   }
 });
 
-tape("a partly-parallel queue of ten synchronous tasks executes all tasks in series", function(test) {
+tape("a partly-concurrent queue of ten synchronous tasks executes all tasks in series", function(test) {
   var t = synchronousTask();
   queue(3)
       .defer(t)

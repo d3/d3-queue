@@ -4,8 +4,8 @@ import noop from "./noop";
 var noabort = {},
     success = [null];
 
-function newQueue(parallelism) {
-  if (!(parallelism >= 1)) throw new Error;
+function newQueue(concurrency) {
+  if (!(concurrency >= 1)) throw new Error;
 
   var q,
       tasks = [],
@@ -20,7 +20,7 @@ function newQueue(parallelism) {
 
   function start() {
     if (starting) return; // let the current task complete
-    while (starting = waiting && active < parallelism) {
+    while (starting = waiting && active < concurrency) {
       var i = ended + active,
           t = tasks[i],
           j = t.length - 1,
@@ -89,6 +89,6 @@ function newQueue(parallelism) {
   };
 }
 
-export default function(parallelism) {
-  return newQueue(arguments.length ? +parallelism : Infinity);
+export default function(concurrency) {
+  return newQueue(arguments.length ? +concurrency : Infinity);
 }
