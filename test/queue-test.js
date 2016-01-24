@@ -105,7 +105,11 @@ tape("in a queue with multiple synchronous tasks that error, the first error pre
 });
 
 tape("a serial queue of asynchronous closures processes tasks serially", function(test) {
-  var tasks = [], task = asynchronousTask(), n = 10, q = queue(1);
+  var tasks = [],
+      task = asynchronousTask(),
+      n = 10,
+      q = queue(1);
+
   while (--n >= 0) tasks.push(task);
   tasks.forEach(function(t) { q.defer(t); });
   q.awaitAll(callback);
@@ -130,6 +134,7 @@ tape("a serial queue of asynchronous closures processes tasks serially", functio
 
 tape("a fully-concurrent queue of ten asynchronous tasks executes all tasks concurrently", function(test) {
   var t = asynchronousTask();
+
   queue()
       .defer(t)
       .defer(t)
@@ -163,6 +168,7 @@ tape("a fully-concurrent queue of ten asynchronous tasks executes all tasks conc
 
 tape("a partly-concurrent queue of ten asynchronous tasks executes at most three tasks concurrently", function(test) {
   var t = asynchronousTask();
+
   queue(3)
       .defer(t)
       .defer(t)
@@ -196,6 +202,7 @@ tape("a partly-concurrent queue of ten asynchronous tasks executes at most three
 
 tape("a serialized queue of ten asynchronous tasks executes all tasks in series", function(test) {
   var t = asynchronousTask();
+
   queue(1)
       .defer(t)
       .defer(t)
@@ -229,6 +236,7 @@ tape("a serialized queue of ten asynchronous tasks executes all tasks in series"
 
 tape("a serialized queue of ten deferred synchronous tasks executes all tasks in series, within the callback of the first task", function(test) {
   var t = deferredSynchronousTask();
+
   queue(1)
       .defer(t)
       .defer(t)
@@ -241,6 +249,7 @@ tape("a serialized queue of ten deferred synchronous tasks executes all tasks in
       .defer(t)
       .defer(t)
       .awaitAll(callback);
+
   t.finish();
 
   function callback(error, results) {
@@ -263,6 +272,7 @@ tape("a serialized queue of ten deferred synchronous tasks executes all tasks in
 
 tape("a partly-concurrent queue of ten synchronous tasks executes all tasks in series", function(test) {
   var t = synchronousTask();
+
   queue(3)
       .defer(t)
       .defer(t)
@@ -296,6 +306,7 @@ tape("a partly-concurrent queue of ten synchronous tasks executes all tasks in s
 
 tape("a serialized queue of ten synchronous tasks executes all tasks in series", function(test) {
   var t = synchronousTask();
+
   queue(1)
       .defer(t)
       .defer(t)
@@ -333,7 +344,6 @@ tape("a huge queue of deferred synchronous tasks does not throw a RangeError", f
       n = 200000;
 
   for (var i = 0; i < n; ++i) q.defer(t);
-
   t.finish();
   q.awaitAll(callback);
 
@@ -362,6 +372,7 @@ tape("a task that calls back with an error more than once throws an Error", func
 
 tape("a task that defers another task is allowed", function(test) {
   var q = queue();
+
   q.defer(function(callback) {
     callback(null);
     q.defer(function(callback) {
