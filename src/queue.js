@@ -36,13 +36,12 @@ function newQueue(concurrency) {
 
   function end(i) {
     return function(e, r) {
-      if (!tasks[i]) return; // ignore multiple callbacks
-      --active, ++ended;
-      tasks[i] = null;
-      if (error != null) return; // only report the first error
+      if (error != null || !tasks[i]) return; // ignore multiple callbacks
       if (e != null) {
         abort(e);
       } else {
+        --active, ++ended;
+        tasks[i] = null;
         results[i] = r;
         if (waiting) start();
         else if (!active) notify();
@@ -52,9 +51,16 @@ function newQueue(concurrency) {
 
   function abort(e) {
     var i = ended + active, t;
-    error = e; // ignore new tasks and squelch active callbacks
+    error = e; // ignore active callbacks
     waiting = active = NaN; // prevent starting and allow notification
-    while (--i >= 0) if ((t = tasks[i]) && t.abort) t.abort();
+
+    while (--i >= 0) {
+      if ((t = tasks[i]) && t.abort) {
+        try { t.abort(); }
+        catch (e) { /* ignore */ }
+      }
+    }
+
     notify();
   }
 
