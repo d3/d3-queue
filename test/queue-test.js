@@ -92,7 +92,7 @@ tape("in a queue with multiple synchronous tasks that error, the first error pre
   queue()
       .defer(function(callback) { callback(-1); })
       .defer(function(callback) { callback(-2); })
-      .defer(function(callback) { throw new Error(); })
+      .defer(function(callback) { throw new Error; })
       .await(callback);
 
   function callback(error, one, two, three) {
@@ -100,6 +100,18 @@ tape("in a queue with multiple synchronous tasks that error, the first error pre
     test.equal(one, undefined);
     test.equal(two, undefined);
     test.equal(three, undefined);
+    test.end();
+  }
+});
+
+tape("in a queue with a task that doesn’t terminate and another that errors synchronously, the error is still reported", function(test) {
+  queue()
+      .defer(function() { /* Run forever! */ })
+      .defer(function(callback) { callback(new Error("foo")); })
+      .await(callback);
+
+  function callback(error) {
+    test.equal(error.message, "foo");
     test.end();
   }
 });

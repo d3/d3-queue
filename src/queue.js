@@ -47,7 +47,7 @@ function newQueue(concurrency) {
 
   function abort(e) {
     error = e; // ignore new tasks and squelch active callbacks
-    waiting = NaN; // stop queued tasks from starting
+    waiting = active = NaN; // stop tasks from starting and allow notification
     notify();
   }
 
