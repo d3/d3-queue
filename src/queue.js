@@ -7,7 +7,7 @@ function Task(id, callback, parameters) {
   this._id = id; // -1 when terminated
   this._next =
   this._previous = null;
-  this._value = undefined;
+  this._object = undefined;
   this._parameters = parameters;
   parameters.push(callback);
 }
@@ -56,7 +56,7 @@ function start(q) {
     p[i] = end(q, t0);
     c = c.apply(null, p);
     if (t0._id < 0) continue; // task finished synchronously
-    t0._value = c;
+    t0._object = c;
   }
 }
 
@@ -76,7 +76,6 @@ function end(q, t) {
     if (error != null) {
       abort(q, error);
     } else {
-      t._value = value;
       if (q._values) q._values[id] = value;
       if (q._waitingHead) poke(q);
       else if (!q._activeHead) notify(q);
@@ -85,7 +84,7 @@ function end(q, t) {
 }
 
 function abort(q, error) {
-  var h = q._activeHead, t, v;
+  var h = q._activeHead, t, o;
 
   // Store the error, and prevent any new tasks from being deferred or started.
   q._error = error;
@@ -100,9 +99,9 @@ function abort(q, error) {
 
   // Now abort all tasks, ignoring any secondary errors.
   for (t = h; t; t = t._next) {
-    if ((v = t._value) && v.abort) {
-      try { v.abort(); }
-      catch (error2) { /* ignore */ }
+    if ((o = t._object) && o.abort) {
+      try { o.abort(); }
+      catch (_) { /* ignore */ }
     }
   }
 
