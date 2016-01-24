@@ -1,8 +1,8 @@
 # d3-queue
 
-Queues are a minimalist approach to escaping callback hell in JavaScript. As of release 1.2, d3-queue is 566 bytes gzipped. Compare that to [Async.js](https://github.com/caolan/async), which is 4,300! (This library was formerly known as **Queue.js**.)
+A **queue** evaluates zero or more *deferred* asynchronous tasks with configurable concurrency: you control how many tasks run at the same time. When all the tasks complete, or an error occurs, the queue passes the results to your *await* callback. This library is similar to [Async.js](https://github.com/caolan/async)’s [queue](https://github.com/caolan/async#queue), but features a much smaller footprint: as of release 1.2, d3-queue is only 566 bytes gzipped, compared to 4,300 for Async.
 
-A queue evaluates zero or more asynchronous tasks with configurable concurrency. Each task is a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
+Each task is defined as a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
 
 ```js
 function delayedHello(callback) {
