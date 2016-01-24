@@ -18,8 +18,13 @@ function newQueue(concurrency) {
       callback = noop,
       callbackAll = true;
 
-  function start() {
+  function poke() {
     if (starting) return; // let the current task complete
+    try { start(); }
+    catch (e) { if (tasks[ended + active - 1]) abort(e); } // task errored synchronously
+  }
+
+  function start() {
     while (starting = waiting && active < concurrency) {
       var i = ended + active,
           t = tasks[i],
@@ -27,8 +32,7 @@ function newQueue(concurrency) {
           c = t[j];
       t[j] = end(i);
       --waiting, ++active;
-      try { t = c.apply(null, t); }
-      catch (e) { if (tasks[i]) return abort(e); } // threw before finishing?
+      t = c.apply(null, t);
       if (!tasks[i]) continue; // task finished synchronously
       tasks[i] = t || noabort;
     }
@@ -43,7 +47,7 @@ function newQueue(concurrency) {
         --active, ++ended;
         tasks[i] = null;
         results[i] = r;
-        if (waiting) start();
+        if (waiting) poke();
         else if (!active) notify();
       }
     };
@@ -76,7 +80,7 @@ function newQueue(concurrency) {
       var t = slice.call(arguments, 1);
       t.push(f);
       ++waiting, tasks.push(t);
-      start();
+      poke();
       return q;
     },
     abort: function() {
