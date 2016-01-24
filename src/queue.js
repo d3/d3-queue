@@ -89,8 +89,6 @@ function abort(q, error) {
   // Store the error, and prevent any new tasks from being deferred or started.
   q._error = error;
   q._active = 0;
-  q._activeHead =
-  q._activeTail =
   q._waitingHead =
   q._waitingTail = null;
 
@@ -105,6 +103,9 @@ function abort(q, error) {
     }
   }
 
+  // Allow notification.
+  q._activeHead =
+  q._activeTail = null;
   notify(q);
 }
 
