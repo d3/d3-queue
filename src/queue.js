@@ -148,6 +148,10 @@ Queue.prototype = {
   }
 };
 
-export default function(concurrency) {
+function queue(concurrency) {
   return new Queue(arguments.length ? +concurrency : Infinity);
 }
+
+queue.prototype = Queue.prototype;
+
+export default queue;
