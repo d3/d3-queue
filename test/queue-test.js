@@ -104,6 +104,31 @@ tape("in a queue with multiple synchronous tasks that error, the first error pre
   }
 });
 
+tape("in a queue with a task that throws an error synchronously, the error is reported to the await callback", function(test) {
+  queue()
+      .defer(function(callback) { throw new Error("foo"); })
+      .await(callback);
+
+  function callback(error) {
+    test.equal(error.message, "foo");
+    test.end();
+  }
+});
+
+tape("in a queue with a task that throws an error after calling back, the error is ignored", function(test) {
+  queue()
+      .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
+      .defer(function(callback) { callback(null, 2); process.nextTick(function() { callback(new Error("foo")); }); })
+      .await(callback);
+
+  function callback(error, one, two) {
+    test.equal(error, null);
+    test.equal(one, 1);
+    test.equal(two, 2);
+    test.end();
+  }
+});
+
 tape("in a queue with a task that doesn’t terminate and another that errors synchronously, the error is still reported", function(test) {
   queue()
       .defer(function() { /* Run forever! */ })
@@ -366,20 +391,44 @@ tape("a huge queue of deferred synchronous tasks does not throw a RangeError", f
   }
 });
 
-tape("a task that calls back successfully more than once throws an Error", function(test) {
-  queue().defer(function(callback) {
-    callback(null);
-    test.throws(function() { callback(null); }, /Error/);
+tape("if a task calls back successfully more than once, subsequent calls are ignored", function(test) {
+  queue()
+      .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
+      .defer(function(callback) { callback(null, 2); process.nextTick(function() { callback(null, -1); }); })
+      .defer(function(callback) { callback(null, 3); process.nextTick(function() { callback(new Error("foo")); }); })
+      .await(callback);
+
+  function callback(error, one, two, three) {
+    test.equal(error, null);
+    test.equal(one, 1);
+    test.equal(two, 2);
+    test.equal(three, 3);
     test.end();
-  });
+  }
 });
 
-tape("a task that calls back with an error more than once throws an Error", function(test) {
-  queue().defer(function(callback) {
-    callback(new Error);
-    test.throws(function() { callback(new Error); }, /Error/);
+tape("if a task calls back with an error more than once, subsequent calls are ignored", function(test) {
+  queue()
+      .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
+      .defer(function(callback) { callback(new Error("foo")); process.nextTick(function() { callback(new Error("bar")); }); })
+      .await(callback);
+
+  function callback(error) {
+    test.equal(error.message, "foo");
     test.end();
-  });
+  }
+});
+
+tape("if a task calls throws an error aftering calling back synchronously, the error is ignored", function(test) {
+  queue()
+      .defer(function(callback) { callback(null, 1); throw new Error; })
+      .await(callback);
+
+  function callback(error, one) {
+    test.equal(error, null);
+    test.equal(one, 1);
+    test.end();
+  }
 });
 
 tape("a task that defers another task is allowed", function(test) {
