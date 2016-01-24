@@ -40,12 +40,13 @@ function newQueue(concurrency) {
 
   function end(i) {
     return function(e, r) {
-      if (error != null || !tasks[i]) return; // ignore multiple callbacks
+      if (!tasks[i]) return; // ignore multiple callbacks
+      --active, ++ended;
+      tasks[i] = null;
+      if (error != null) return; // ignore secondary errors
       if (e != null) {
         abort(e);
       } else {
-        --active, ++ended;
-        tasks[i] = null;
         results[i] = r;
         if (waiting) poke();
         else if (!active) notify();

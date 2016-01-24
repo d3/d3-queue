@@ -434,6 +434,20 @@ tape("if a task calls throws an error aftering calling back synchronously, the e
   }
 });
 
+tape("if a task errors, it is not subsequently aborted", function(test) {
+  var aborted = false;
+
+  var q = queue()
+      .defer(function(callback) { process.nextTick(function() { callback(new Error("foo")); }); return {abort: function() { aborted = true; }}; })
+      .await(callback);
+
+  function callback(error) {
+    test.equal(error.message, "foo");
+    test.equal(aborted, false);
+    test.end();
+  }
+});
+
 tape("a task that defers another task is allowed", function(test) {
   var q = queue();
 
