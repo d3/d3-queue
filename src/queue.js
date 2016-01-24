@@ -57,7 +57,7 @@ function newQueue(concurrency) {
   function abort(e) {
     var i = ended + active, t;
     error = e; // ignore active callbacks
-    active = NaN; // prevent starting and allow notification
+    waiting = NaN; // prevent starting
 
     while (--i >= 0) {
       if ((t = tasks[i]) && t.abort) {
@@ -66,6 +66,7 @@ function newQueue(concurrency) {
       }
     }
 
+    active = NaN; // allow notification
     notify();
   }
 

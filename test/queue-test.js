@@ -466,6 +466,17 @@ tape("a falsey error is still considered an error", function(test) {
       .await(function(error) { test.equal(error, 0); test.end(); });
 });
 
+tape("if the await callback is set during abort, it only gets called once", function(test) {
+  var q = queue();
+  q.defer(function() { return {abort: function() { q.await(callback); }}; });
+  q.defer(function() { throw new Error("foo"); });
+
+  function callback(error) {
+    test.equal(error.message, "foo");
+    test.end();
+  }
+});
+
 tape("aborts a queue of partially-completed asynchronous tasks", function(test) {
   var shortTask = abortableTask(50),
       longTask = abortableTask(5000);
