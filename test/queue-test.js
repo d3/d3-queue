@@ -396,13 +396,15 @@ tape("if a task calls back successfully more than once, subsequent calls are ign
       .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
       .defer(function(callback) { callback(null, 2); process.nextTick(function() { callback(null, -1); }); })
       .defer(function(callback) { callback(null, 3); process.nextTick(function() { callback(new Error("foo")); }); })
+      .defer(function(callback) { process.nextTick(function() { callback(null, 4); }); setTimeout(function() { callback(new Error("bar")); }, 100); })
       .await(callback);
 
-  function callback(error, one, two, three) {
+  function callback(error, one, two, three, four) {
     test.equal(error, null);
     test.equal(one, 1);
     test.equal(two, 2);
     test.equal(three, 3);
+    test.equal(four, 4);
     test.end();
   }
 });
@@ -411,6 +413,7 @@ tape("if a task calls back with an error more than once, subsequent calls are ig
   queue()
       .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
       .defer(function(callback) { callback(new Error("foo")); process.nextTick(function() { callback(new Error("bar")); }); })
+      .defer(function(callback) { process.nextTick(function() { callback(new Error("bar")); }); setTimeout(function() { callback(new Error("baz")); }, 100); })
       .await(callback);
 
   function callback(error) {
