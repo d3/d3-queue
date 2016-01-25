@@ -17,7 +17,7 @@ function Queue(concurrency) {
   if (!(concurrency >= 1)) throw new Error;
   this._free = concurrency;
   this._index = -1;
-  this._starting = false;
+  this._starting = null;
   this._waiting = {head: null, tail: null};
   this._active = {head: null, tail: null};
   this._values = [];
