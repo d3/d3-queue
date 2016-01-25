@@ -1,8 +1,7 @@
 import {slice} from "./array";
 import noop from "./noop";
 
-var noabort = {},
-    success = [null];
+var noabort = {};
 
 function newQueue(concurrency) {
   if (!(concurrency >= 1)) throw new Error;
@@ -14,9 +13,8 @@ function newQueue(concurrency) {
       active = 0,
       ended = 0,
       starting, // inside a synchronous task callback?
-      error,
-      callback = noop,
-      callbackAll = true;
+      error = null,
+      notify = noop;
 
   function poke() {
     if (!starting) try { start(); } // let the current task complete
@@ -48,7 +46,7 @@ function newQueue(concurrency) {
       } else {
         results[i] = r;
         if (waiting) poke();
-        else if (!active) notify();
+        else if (!active) notify(error, results);
       }
     };
   }
@@ -56,7 +54,7 @@ function newQueue(concurrency) {
   function abort(e) {
     var i = tasks.length, t;
     error = e; // ignore active callbacks
-    results = null; // allow gc
+    results = undefined; // allow gc
     waiting = NaN; // prevent starting
 
     while (--i >= 0) {
@@ -68,21 +66,15 @@ function newQueue(concurrency) {
     }
 
     active = NaN; // allow notification
-    notify();
-  }
-
-  function notify() {
-    if (error != null) callback(error);
-    else if (callbackAll) callback(null, results);
-    else callback.apply(null, success.concat(results));
+    notify(error, results);
   }
 
   return q = {
-    defer: function(f) {
-      if (callback !== noop) throw new Error;
+    defer: function(task) {
+      if (notify !== noop) throw new Error;
       if (error != null) return q;
       var t = slice.call(arguments, 1);
-      t.push(f);
+      t.push(task);
       ++waiting, tasks.push(t);
       poke();
       return q;
@@ -91,16 +83,16 @@ function newQueue(concurrency) {
       if (error == null) abort(new Error("abort"));
       return q;
     },
-    await: function(f) {
-      if (callback !== noop) throw new Error;
-      callback = f, callbackAll = false;
-      if (!active) notify();
+    await: function(callback) {
+      if (notify !== noop) throw new Error;
+      notify = function(error, results) { callback.apply(null, [error].concat(results)); };
+      if (!active) notify(error, results);
       return q;
     },
-    awaitAll: function(f) {
-      if (callback !== noop) throw new Error;
-      callback = f, callbackAll = true;
-      if (!active) notify();
+    awaitAll: function(callback) {
+      if (notify !== noop) throw new Error;
+      notify = callback;
+      if (!active) notify(error, results);
       return q;
     }
   };
