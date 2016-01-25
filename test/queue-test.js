@@ -439,7 +439,7 @@ tape("if a task calls back with an error more than once, subsequent calls are ig
   }
 });
 
-tape("if a task calls throws an error aftering calling back synchronously, the error is ignored", function(test) {
+tape("if a task throws an error aftering calling back synchronously, the error is ignored", function(test) {
   queue()
       .defer(function(callback) { callback(null, 1); throw new Error; })
       .await(callback);
