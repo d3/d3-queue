@@ -19,8 +19,7 @@ function newQueue(concurrency) {
       callbackAll = true;
 
   function poke() {
-    if (starting) return; // let the current task complete
-    try { start(); }
+    if (!starting) try { start(); } // let the current task complete
     catch (e) { if (tasks[ended + active - 1]) abort(e); } // task errored synchronously
   }
 
@@ -55,13 +54,15 @@ function newQueue(concurrency) {
   }
 
   function abort(e) {
-    var i = ended + active, t;
+    var i = tasks.length, t;
     error = e; // ignore active callbacks
+    results = null; // allow gc
     waiting = NaN; // prevent starting
 
     while (--i >= 0) {
-      if ((t = tasks[i]) && t.abort) {
-        try { t.abort(); }
+      if (t = tasks[i]) {
+        tasks[i] = null;
+        if (t.abort) try { t.abort(); }
         catch (e) { /* ignore */ }
       }
     }
@@ -79,6 +80,7 @@ function newQueue(concurrency) {
   return q = {
     defer: function(f) {
       if (callback !== noop) throw new Error;
+      if (error != null) return q;
       var t = slice.call(arguments, 1);
       t.push(f);
       ++waiting, tasks.push(t);
