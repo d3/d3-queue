@@ -1,10 +1,12 @@
 import {slice} from "./array";
+import {push, pop, remove} from "./list";
 import noop from "./noop";
 
-var success = [null];
+var noabort = {},
+    success = [null];
 
 function Task(id, callback, parameters) {
-  this.id = id; // -1 when terminated
+  this.id = id;
   this.next =
   this.previous = null;
   this.object = parameters;
@@ -16,80 +18,61 @@ function Queue(concurrency) {
   this._free = concurrency;
   this._index = -1;
   this._starting = false;
-  this._waitingHead =
-  this._waitingTail =
-  this._activeHead =
-  this._activeTail = null;
+  this._waiting = {head: null, tail: null};
+  this._active = {head: null, tail: null};
   this._values = [];
   this._callback = noop;
 }
 
 function poke(q) {
   if (q._starting) return; // let the current task complete
-  try { start(q); }
-  catch (e) { if (q._activeTail && q._activeTail.id >= 0) abort(q, e); } // task errored synchronously
+  try { start(q); } catch (e) {
+    if (q._starting && q._starting.object) { // task errored before finishing
+      q._starting = null;
+      abort(q, e);
+    }
+  }
 }
 
 function start(q) {
-  var t0, t1;
-  while (q._starting = (t0 = q._waitingHead) && q._free) {
-    var o = t0.object,
+  var t;
+  while (q._starting = q._free && (t = pop(q._waiting))) {
+    var o = t.object,
         i = o.length - 1,
         c = o[i];
-
-    // Remove t0 from the head of the waiting list.
-    if (t1 = t0.next) t0.next = null, t1.previous = null;
-    else q._waitingTail = null;
-    q._waitingHead = t1;
-
-    // Add t0 to the tail of the active list.
-    if (t0.previous = q._activeTail) q._activeTail.next = t0;
-    else q._activeHead = t0;
-    q._activeTail = t0;
+    push(q._active, t);
     --q._free;
-
-    // Start t0.
-    o[i] = end(q, t0);
-    c = c.apply(null, o);
-    if (t0.id < 0) continue; // task finished synchronously
-    t0.object = c;
+    o[i] = end(q, t);
+    c = c.apply(null, o); // start the task
+    if (!t.object) continue; // task finished synchronously
+    t.object = c || noabort;
   }
 }
 
 function end(q, t) {
   return function(error, value) {
-    var id = t.id;
-    if (id < 0) return; // ignore multiple callbacks
-    t.id = -1;
-    ++q._free;
-
-    // Remove t from the middle of the active list.
-    var t0 = t.previous, t1 = t.next;
-    if (t0) t0.next = t1; else q._activeHead = t1;
-    if (t1) t1.previous = t0; else q._activeTail = t0;
-
+    if (!t.object) return; // ignore multiple callbacks
+    t.object = null;
     if (q._error != null) return; // ignore secondary errors
     if (error != null) {
       abort(q, error);
     } else {
-      if (q._values) q._values[id] = value;
-      if (q._waitingHead) poke(q);
-      else if (!q._activeHead) notify(q);
+      ++q._free;
+      remove(q._active, t);
+      if (q._values) q._values[t.id] = value;
+      if (q._waiting.head) poke(q);
+      else if (!q._active.head) notify(q);
     }
   };
 }
 
 function abort(q, error) {
-  var h = q._activeHead, t, o;
+  var h = q._active.head, t, o;
 
-  // Store the error, and prevent any new tasks from being deferred or started.
+  // Store the error, and prevent any new tasks from starting.
   q._error = error;
-  q._active = 0;
-  q._waitingHead =
-  q._waitingTail = null;
-
-  // Inactive all tasks, squelching potential callbacks during abort.
-  for (t = h; t; t = t.next) t.id = -1;
+  q._waiting.head =
+  q._waiting.tail = null;
 
   // Now abort all tasks, ignoring any secondary errors.
   for (t = h; t; t = t.next) {
@@ -100,8 +83,8 @@ function abort(q, error) {
   }
 
   // Allow notification.
-  q._activeHead =
-  q._activeTail = null;
+  q._active.head =
+  q._active.tail = null;
   notify(q);
 }
 
@@ -115,13 +98,7 @@ Queue.prototype = {
   defer: function(callback) {
     if (this._callback !== noop) throw new Error;
     if (this._error != null) return this; // Ignore new tasks if errored.
-    var t = new Task(++this._index, callback, slice.call(arguments, 1));
-
-    // Add the new task to the tail of the waiting list.
-    if (t.previous = this._waitingTail) this._waitingTail.next = t;
-    else this._waitingHead = t;
-    this._waitingTail = t;
-
+    push(this._waiting, new Task(++this._index, callback, slice.call(arguments, 1)));
     poke(this);
     return this;
   },
@@ -135,13 +112,13 @@ Queue.prototype = {
       if (error != null) callback(error);
       else callback.apply(null, success.concat(values));
     };
-    if (!this._activeTail) notify(this);
+    if (!this._active.tail) notify(this);
     return this;
   },
   awaitAll: function(callback) {
     if (this._callback !== noop) throw new Error;
     this._callback = callback;
-    if (!this._activeTail) notify(this);
+    if (!this._active.tail) notify(this);
     return this;
   }
 };
