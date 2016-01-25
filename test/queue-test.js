@@ -34,6 +34,23 @@ tape("if the concurrency is invalid, an Error is thrown", function(test) {
   test.end();
 });
 
+tape("queue.defer throws an error if passed a non-function", function(test) {
+  test.throws(function() { queue().defer(42); }, /Error/);
+  test.end();
+});
+
+tape("queue.await throws an error if passed a non-function", function(test) {
+  var task = asynchronousTask();
+  test.throws(function() { queue().defer(task).await(42); }, /Error/);
+  test.end();
+});
+
+tape("queue.awaitAll throws an error if passed a non-function", function(test) {
+  var task = asynchronousTask();
+  test.throws(function() { queue().defer(task).awaitAll(42); }, /Error/);
+  test.end();
+});
+
 tape("in a queue of a single synchronous task that errors, the error is returned", function(test) {
   queue()
       .defer(function(callback) { callback(-1); })

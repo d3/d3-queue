@@ -70,11 +70,11 @@ function newQueue(concurrency) {
   }
 
   return q = {
-    defer: function(task) {
-      if (notify !== noop) throw new Error;
+    defer: function(callback) {
+      if (typeof callback !== "function" || notify !== noop) throw new Error;
       if (error != null) return q;
       var t = slice.call(arguments, 1);
-      t.push(task);
+      t.push(callback);
       ++waiting, tasks.push(t);
       poke();
       return q;
@@ -84,13 +84,13 @@ function newQueue(concurrency) {
       return q;
     },
     await: function(callback) {
-      if (notify !== noop) throw new Error;
+      if (typeof callback !== "function" || notify !== noop) throw new Error;
       notify = function(error, results) { callback.apply(null, [error].concat(results)); };
       if (!active) notify(error, results);
       return q;
     },
     awaitAll: function(callback) {
-      if (notify !== noop) throw new Error;
+      if (typeof callback !== "function" || notify !== noop) throw new Error;
       notify = callback;
       if (!active) notify(error, results);
       return q;
