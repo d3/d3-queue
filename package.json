@@ -1,6 +1,6 @@
 {
   "name": "d3-queue",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "A minimalist approach to escaping callback hell.",
   "keywords": [
     "d3",
@@ -14,16 +14,16 @@
     "name": "Mike Bostock",
     "url": "http://bost.ocks.org/mike"
   },
-  "main": "build/queue.js",
+  "main": "build/d3-queue.js",
   "jsnext:main": "index",
   "repository": {
     "type": "git",
     "url": "https://github.com/d3/d3-queue.git"
   },
   "scripts": {
-    "pretest": "mkdir -p build && node -e 'process.stdout.write(\"import queue from \\\"../index\\\"; queue.version = \\\"\" + require(\"./package.json\").version + \"\\\"; export default queue;\");' > build/bundle.js && rollup -f umd -u queue -n queue -o build/queue.js -- build/bundle.js",
+    "pretest": "mkdir -p build && node -e 'process.stdout.write(\"var version = \\\"\" + require(\"./package.json\").version + \"\\\"; export * from \\\"../index\\\"; export {version};\");' > build/bundle.js && rollup -f umd -u d3-queue -n d3_queue -o build/d3-queue.js -- build/bundle.js",
     "test": "faucet `find test -name '*-test.js'` && eslint index.js src",
-    "prepublish": "npm run test && uglifyjs build/queue.js -c -m -o build/queue.min.js && rm -f build/queue.zip && zip -j build/queue.zip -- LICENSE README.md build/queue.js build/queue.min.js"
+    "prepublish": "npm run test && uglifyjs build/d3-queue.js -c -m -o build/d3-queue.min.js && rm -f build/d3-queue.zip && zip -j build/d3-queue.zip -- LICENSE README.md build/d3-queue.js build/d3-queue.min.js"
   },
   "devDependencies": {
     "faucet": "0.0",

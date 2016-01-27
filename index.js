@@ -1,3 +1,1 @@
-import queue from "./src/queue";
-
-export default queue;
+export {default as queue} from "./src/queue";

@@ -12,7 +12,7 @@ tape("version is semantic", function(test) {
 });
 
 tape("example queue of fs.stat", function(test) {
-  queue()
+  queue.queue()
       .defer(fs.stat, __dirname + "/../index.js")
       .defer(fs.stat, __dirname + "/../README.md")
       .defer(fs.stat, __dirname + "/../package.json")
@@ -28,31 +28,31 @@ tape("example queue of fs.stat", function(test) {
 });
 
 tape("if the concurrency is invalid, an Error is thrown", function(test) {
-  test.throws(function() { queue(NaN); }, /Error/);
-  test.throws(function() { queue(0); }, /Error/);
-  test.throws(function() { queue(-1); }, /Error/);
+  test.throws(function() { queue.queue(NaN); }, /Error/);
+  test.throws(function() { queue.queue(0); }, /Error/);
+  test.throws(function() { queue.queue(-1); }, /Error/);
   test.end();
 });
 
 tape("queue.defer throws an error if passed a non-function", function(test) {
-  test.throws(function() { queue().defer(42); }, /Error/);
+  test.throws(function() { queue.queue().defer(42); }, /Error/);
   test.end();
 });
 
 tape("queue.await throws an error if passed a non-function", function(test) {
   var task = asynchronousTask();
-  test.throws(function() { queue().defer(task).await(42); }, /Error/);
+  test.throws(function() { queue.queue().defer(task).await(42); }, /Error/);
   test.end();
 });
 
 tape("queue.awaitAll throws an error if passed a non-function", function(test) {
   var task = asynchronousTask();
-  test.throws(function() { queue().defer(task).awaitAll(42); }, /Error/);
+  test.throws(function() { queue.queue().defer(task).awaitAll(42); }, /Error/);
   test.end();
 });
 
 tape("in a queue of a single synchronous task that errors, the error is returned", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { callback(-1); })
       .await(callback);
 
@@ -64,7 +64,7 @@ tape("in a queue of a single synchronous task that errors, the error is returned
 });
 
 tape("in a queue of a single asynchronous task that errors, the error is returned", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { process.nextTick(function() { callback(-1); }); })
       .await(callback);
 
@@ -76,7 +76,7 @@ tape("in a queue of a single asynchronous task that errors, the error is returne
 });
 
 tape("in a queue with multiple tasks that error, the first error is returned", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { setTimeout(function() { callback(-2); }, 100); })
       .defer(function(callback) { process.nextTick(function() { callback(-1); }); })
       .defer(function(callback) { setTimeout(function() { callback(-3); }, 200); })
@@ -92,7 +92,7 @@ tape("in a queue with multiple tasks that error, the first error is returned", f
 });
 
 tape("in a queue with multiple tasks where one errors, the first error is returned", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { process.nextTick(function() { callback(-1); }); })
       .defer(function(callback) { process.nextTick(function() { callback(null, 'ok'); }); })
       .await(callback);
@@ -106,7 +106,7 @@ tape("in a queue with multiple tasks where one errors, the first error is return
 });
 
 tape("in a queue with multiple synchronous tasks that error, the first error prevents the other tasks from running", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { callback(-1); })
       .defer(function(callback) { callback(-2); })
       .defer(function(callback) { throw new Error; })
@@ -122,7 +122,7 @@ tape("in a queue with multiple synchronous tasks that error, the first error pre
 });
 
 tape("in a queue with a task that throws an error synchronously, the error is reported to the await callback", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { throw new Error("foo"); })
       .await(callback);
 
@@ -133,7 +133,7 @@ tape("in a queue with a task that throws an error synchronously, the error is re
 });
 
 tape("in a queue with a task that throws an error after calling back, the error is ignored", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
       .defer(function(callback) { callback(null, 2); process.nextTick(function() { callback(new Error("foo")); }); })
       .await(callback);
@@ -147,7 +147,7 @@ tape("in a queue with a task that throws an error after calling back, the error 
 });
 
 tape("in a queue with a task that doesn’t terminate and another that errors synchronously, the error is still reported", function(test) {
-  queue()
+  queue.queue()
       .defer(function() { /* Run forever! */ })
       .defer(function(callback) { callback(new Error("foo")); })
       .await(callback);
@@ -162,7 +162,7 @@ tape("a serial queue of asynchronous closures processes tasks serially", functio
   var tasks = [],
       task = asynchronousTask(),
       n = 10,
-      q = queue(1);
+      q = queue.queue(1);
 
   while (--n >= 0) tasks.push(task);
   tasks.forEach(function(t) { q.defer(t); });
@@ -189,7 +189,7 @@ tape("a serial queue of asynchronous closures processes tasks serially", functio
 tape("a fully-concurrent queue of ten asynchronous tasks executes all tasks concurrently", function(test) {
   var t = asynchronousTask();
 
-  queue()
+  queue.queue()
       .defer(t)
       .defer(t)
       .defer(t)
@@ -223,7 +223,7 @@ tape("a fully-concurrent queue of ten asynchronous tasks executes all tasks conc
 tape("a partly-concurrent queue of ten asynchronous tasks executes at most three tasks concurrently", function(test) {
   var t = asynchronousTask();
 
-  queue(3)
+  queue.queue(3)
       .defer(t)
       .defer(t)
       .defer(t)
@@ -257,7 +257,7 @@ tape("a partly-concurrent queue of ten asynchronous tasks executes at most three
 tape("a serialized queue of ten asynchronous tasks executes all tasks in series", function(test) {
   var t = asynchronousTask();
 
-  queue(1)
+  queue.queue(1)
       .defer(t)
       .defer(t)
       .defer(t)
@@ -291,7 +291,7 @@ tape("a serialized queue of ten asynchronous tasks executes all tasks in series"
 tape("a serialized queue of ten deferred synchronous tasks executes all tasks in series, within the callback of the first task", function(test) {
   var t = deferredSynchronousTask();
 
-  queue(1)
+  queue.queue(1)
       .defer(t)
       .defer(t)
       .defer(t)
@@ -327,7 +327,7 @@ tape("a serialized queue of ten deferred synchronous tasks executes all tasks in
 tape("a partly-concurrent queue of ten synchronous tasks executes all tasks in series", function(test) {
   var t = synchronousTask();
 
-  queue(3)
+  queue.queue(3)
       .defer(t)
       .defer(t)
       .defer(t)
@@ -361,7 +361,7 @@ tape("a partly-concurrent queue of ten synchronous tasks executes all tasks in s
 tape("a serialized queue of ten synchronous tasks executes all tasks in series", function(test) {
   var t = synchronousTask();
 
-  queue(1)
+  queue.queue(1)
       .defer(t)
       .defer(t)
       .defer(t)
@@ -394,7 +394,7 @@ tape("a serialized queue of ten synchronous tasks executes all tasks in series",
 
 tape("a huge queue of deferred synchronous tasks does not throw a RangeError", function(test) {
   var t = deferredSynchronousTask(),
-      q = queue(),
+      q = queue.queue(),
       n = 200000;
 
   for (var i = 0; i < n; ++i) q.defer(t);
@@ -409,7 +409,7 @@ tape("a huge queue of deferred synchronous tasks does not throw a RangeError", f
 });
 
 tape("if a task calls back successfully more than once, subsequent calls are ignored", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
       .defer(function(callback) { callback(null, 2); process.nextTick(function() { callback(null, -1); }); })
       .defer(function(callback) { callback(null, 3); process.nextTick(function() { callback(new Error("foo")); }); })
@@ -427,7 +427,7 @@ tape("if a task calls back successfully more than once, subsequent calls are ign
 });
 
 tape("if a task calls back with an error more than once, subsequent calls are ignored", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 100); })
       .defer(function(callback) { callback(new Error("foo")); process.nextTick(function() { callback(new Error("bar")); }); })
       .defer(function(callback) { process.nextTick(function() { callback(new Error("bar")); }); setTimeout(function() { callback(new Error("baz")); }, 100); })
@@ -440,7 +440,7 @@ tape("if a task calls back with an error more than once, subsequent calls are ig
 });
 
 tape("if a task throws an error aftering calling back synchronously, the error is ignored", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { callback(null, 1); throw new Error; })
       .await(callback);
 
@@ -454,7 +454,7 @@ tape("if a task throws an error aftering calling back synchronously, the error i
 tape("if a task errors, it is not subsequently aborted", function(test) {
   var aborted = false;
 
-  var q = queue()
+  var q = queue.queue()
       .defer(function(callback) { process.nextTick(function() { callback(new Error("foo")); }); return {abort: function() { aborted = true; }}; })
       .await(callback);
 
@@ -466,7 +466,7 @@ tape("if a task errors, it is not subsequently aborted", function(test) {
 });
 
 tape("a task that defers another task is allowed", function(test) {
-  var q = queue();
+  var q = queue.queue();
 
   q.defer(function(callback) {
     callback(null);
@@ -477,14 +477,14 @@ tape("a task that defers another task is allowed", function(test) {
 });
 
 tape("a falsey error is still considered an error", function(test) {
-  queue()
+  queue.queue()
       .defer(function(callback) { callback(0); })
       .defer(function() { throw new Error; })
       .await(function(error) { test.equal(error, 0); test.end(); });
 });
 
 tape("if the await callback is set during abort, it only gets called once", function(test) {
-  var q = queue();
+  var q = queue.queue();
   q.defer(function() { return {abort: function() { q.await(callback); }}; });
   q.defer(function() { throw new Error("foo"); });
 
@@ -498,7 +498,7 @@ tape("aborts a queue of partially-completed asynchronous tasks", function(test) 
   var shortTask = abortableTask(50),
       longTask = abortableTask(5000);
 
-  var q = queue()
+  var q = queue.queue()
       .defer(shortTask)
       .defer(longTask)
       .defer(shortTask)
@@ -527,7 +527,7 @@ tape("aborts a queue of partially-completed asynchronous tasks", function(test) 
 tape("aborts an entire queue of asynchronous tasks", function(test) {
   var longTask = abortableTask(5000);
 
-  var q = queue()
+  var q = queue.queue()
       .defer(longTask)
       .defer(longTask)
       .defer(longTask)
@@ -551,7 +551,7 @@ tape("does not abort tasks that have not yet started", function(test) {
   var shortTask = abortableTask(50),
       longTask = abortableTask(5000);
 
-  var q = queue(2) // enough for two short tasks to run
+  var q = queue.queue(2) // enough for two short tasks to run
       .defer(shortTask)
       .defer(longTask)
       .defer(shortTask)

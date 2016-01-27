@@ -1,6 +1,6 @@
 # d3-queue
 
-A **queue** evaluates zero or more *deferred* asynchronous tasks with configurable concurrency: you control how many tasks run at the same time. When all the tasks complete, or an error occurs, the queue passes the results to your *await* callback. This library is similar to [Async.js](https://github.com/caolan/async)’s [parallel](https://github.com/caolan/async#paralleltasks-callback) (when *concurrency* is infinite), [series](https://github.com/caolan/async#seriestasks-callback) (when *concurrency* is 1), and [queue](https://github.com/caolan/async#queue), but features a much smaller footprint: as of release 1.2, d3-queue is about 600 bytes gzipped, compared to 4,300 for Async.
+A **queue** evaluates zero or more *deferred* asynchronous tasks with configurable concurrency: you control how many tasks run at the same time. When all the tasks complete, or an error occurs, the queue passes the results to your *await* callback. This library is similar to [Async.js](https://github.com/caolan/async)’s [parallel](https://github.com/caolan/async#paralleltasks-callback) (when *concurrency* is infinite), [series](https://github.com/caolan/async#seriestasks-callback) (when *concurrency* is 1), and [queue](https://github.com/caolan/async#queue), but features a much smaller footprint: as of release 2, d3-queue is about 600 bytes gzipped, compared to 4,300 for Async.
 
 Each task is defined as a function that takes a callback as its last argument. For example, here’s a task that says hello after a short delay:
 
@@ -18,7 +18,7 @@ When a task completes, it must call the provided callback. The first argument to
 To run multiple tasks simultaneously, create a queue, *defer* your tasks, and then register an *await* callback to be called when all of the tasks complete (or an error occurs):
 
 ```js
-var q = queue();
+var q = d3.queue();
 q.defer(delayedHello);
 q.defer(delayedHello);
 q.await(function(error) {
@@ -30,7 +30,7 @@ q.await(function(error) {
 Of course, you can also use a `for` loop to defer many tasks:
 
 ```js
-var q = queue();
+var q = d3.queue();
 
 for (var i = 0; i < 1000; ++i) {
   q.defer(delayedHello);
@@ -56,7 +56,7 @@ function delayedHello(name, delay, callback) {
 Any additional arguments provided to [*queue*.defer](#queue_defer) are automatically passed along to the task function before the callback argument. You can also use method chaining for conciseness, avoiding the need for a local variable:
 
 ```js
-queue()
+d3.queue()
     .defer(delayedHello, "Alice", 250)
     .defer(delayedHello, "Bob", 500)
     .defer(delayedHello, "Carol", 750)
@@ -69,7 +69,7 @@ queue()
 The [asynchronous callback pattern](https://github.com/maxogden/art-of-node#callbacks) is very common in Node.js, so Queue works directly with many Node APIs. For example, to [stat two files](https://nodejs.org/dist/latest/docs/api/fs.html#fs_fs_stat_path_callback) concurrently:
 
 ```js
-queue()
+d3.queue()
     .defer(fs.stat, __dirname + "/../Makefile")
     .defer(fs.stat, __dirname + "/../package.json")
     .await(function(error, file1, file2) {
@@ -97,7 +97,7 @@ function delayedHello(name, delay, callback) {
 When you call [*queue*.abort](#queue_abort), any in-progress tasks will be immediately aborted; in addition, any pending (not-yet-started) tasks not be started. Note that you can also use *queue*.abort *without* abortable tasks, in which case pending tasks will be cancelled, though active tasks will continue to run. Conveniently, the [d3-request](https://github.com/d3/d3-request) library implements abort atop XMLHttpRequest. For example:
 
 ```js
-var q = queue()
+var q = d3.queue()
     .defer(d3.request, "http://www.google.com:81")
     .defer(d3.request, "http://www.google.com:81")
     .defer(d3.request, "http://www.google.com:81")
@@ -114,14 +114,14 @@ To abort these requests, call `q.abort()`.
 If you use NPM, `npm install d3-queue`. Otherwise, download the [latest release](https://github.com/d3/d3-queue/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3js.org](https://d3js.org):
 
 ```html
-<script src="https://d3js.org/queue.v1.min.js"></script>
+<script src="https://d3js.org/d3-queue.v2.min.js"></script>
 ```
 
-In a vanilla environment, a `queue` global function is exported. [Try d3-queue in your browser.](https://tonicdev.com/npm/d3-queue)
+In a vanilla environment, a `d3_queue` global function is exported. [Try d3-queue in your browser.](https://tonicdev.com/npm/d3-queue)
 
 ## API Reference
 
-<a href="#queue" name="queue">#</a> <b>queue</b>([<i>concurrency</i>])
+<a href="#queue" name="queue">#</a> d3.<b>queue</b>([<i>concurrency</i>])
 
 Constructs a new queue with the specified *concurrency*. If *concurrency* is not specified, the queue has infinite concurrency. Otherwise, *concurrency* is a positive integer. For example, if *concurrency* is 1, then all tasks will be run in series. If *concurrency* is 3, then at most three tasks will be allowed to proceed concurrently; this is useful, for example, when loading resources in a web browser.
 
@@ -152,7 +152,7 @@ Aborts any active tasks, invoking each active task’s *task*.abort function, if
 Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If an error occurred, there are no additional arguments to the callback. Otherwise, the *callback* is passed each result as an additional argument. For example:
 
 ```js
-queue()
+d3.queue()
     .defer(fs.stat, __dirname + "/../Makefile")
     .defer(fs.stat, __dirname + "/../package.json")
     .await(function(error, file1, file2) { console.log(file1, file2); });
@@ -165,7 +165,7 @@ If all [deferred](#queue_defer) tasks have already completed, the callback will 
 Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If an error occurred, there are no additional arguments to the callback. Otherwise, the *callback* is also passed an array of results as the second argument. For example:
 
 ```js
-queue()
+d3.queue()
     .defer(fs.stat, __dirname + "/../Makefile")
     .defer(fs.stat, __dirname + "/../package.json")
     .awaitAll(function(error, files) { console.log(files); });
