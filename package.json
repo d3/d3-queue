@@ -1,6 +1,6 @@
 {
   "name": "d3-queue",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A minimalist approach to escaping callback hell.",
   "keywords": [
     "d3",
@@ -21,7 +21,7 @@
     "url": "https://github.com/d3/d3-queue.git"
   },
   "scripts": {
-    "pretest": "mkdir -p build && node -e 'process.stdout.write(\"var version = \\\"\" + require(\"./package.json\").version + \"\\\"; export * from \\\"../index\\\"; export {version};\");' > build/bundle.js && rollup -f umd -u d3-queue -n d3_queue -o build/d3-queue.js -- build/bundle.js",
+    "pretest": "mkdir -p build && node -e 'process.stdout.write(\"var version = \\\"\" + require(\"./package.json\").version + \"\\\"; export * from \\\"../index\\\"; export {version};\");' > build/bundle.js && rollup -f umd -n d3_queue -o build/d3-queue.js -- build/bundle.js",
     "test": "faucet `find test -name '*-test.js'` && eslint index.js src",
     "prepublish": "npm run test && uglifyjs build/d3-queue.js -c -m -o build/d3-queue.min.js && rm -f build/d3-queue.zip && zip -j build/d3-queue.zip -- LICENSE README.md build/d3-queue.js build/d3-queue.min.js"
   },
