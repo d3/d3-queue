@@ -111,7 +111,7 @@ To abort these requests, call `q.abort()`.
 
 ## Installation
 
-If you use NPM, `npm install d3-queue`. Otherwise, download the [latest release](https://github.com/d3/d3-queue/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3js.org](https://d3js.org):
+If you use NPM, `npm install d3-queue`. If you use Bower, `bower install d3-queue`. Otherwise, download the [latest release](https://github.com/d3/d3-queue/releases/latest). The released bundle supports AMD, CommonJS, and vanilla environments. You can also load directly from [d3js.org](https://d3js.org):
 
 ```html
 <script src="https://d3js.org/d3-queue.v2.min.js"></script>
