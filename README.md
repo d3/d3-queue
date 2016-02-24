@@ -115,6 +115,11 @@ If you use NPM, `npm install d3-queue`. If you use Bower, `bower install d3-queu
 
 ```html
 <script src="https://d3js.org/d3-queue.v2.min.js"></script>
+<script>
+
+var q = d3_queue.queue();
+
+</script>
 ```
 
 In a vanilla environment, a `d3_queue` global function is exported. [Try d3-queue in your browser.](https://tonicdev.com/npm/d3-queue)
