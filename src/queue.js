@@ -83,6 +83,10 @@ function newQueue(concurrency) {
       if (error == null) abort(new Error("abort"));
       return q;
     },
+    cancel: function() {
+      if (error == null) waiting = NaN;
+      return q;
+    },
     await: function(callback) {
       if (typeof callback !== "function" || notify !== noop) throw new Error;
       notify = function(error, results) { callback.apply(null, [error].concat(results)); };
