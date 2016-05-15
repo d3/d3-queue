@@ -27,9 +27,9 @@
     "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cp -v README.md LICENSE build/d3-queue.js ../d3-queue-bower && cd ../d3-queue-bower && git add README.md LICENSE d3-queue.js && git commit -m \"Release $VERSION.\" && git tag -am \"Release $VERSION.\" v${VERSION} && git push && git push --tags && cd ../d3-queue && cp build/d3-queue.js ../d3.github.com/d3-queue.v2.js && cp build/d3-queue.min.js ../d3.github.com/d3-queue.v2.min.js && cd ../d3.github.com && git add d3-queue.v2.js d3-queue.v2.min.js && git commit -m \"d3-queue ${VERSION}\" && git push && cd - && zip -j build/d3-queue.zip -- LICENSE README.md build/d3-queue.js build/d3-queue.min.js"
   },
   "devDependencies": {
+    "eslint": "2",
     "json2module": "0.0",
-    "rollup": "0.25",
-    "seedrandom": "2",
+    "rollup": "0.26",
     "tape": "4",
     "uglify-js": "2"
   }
