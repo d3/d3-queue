@@ -6,11 +6,6 @@ var fs = require("fs"),
     synchronousTask = require("./synchronousTask"),
     queue = require("../");
 
-tape("version is semantic", function(test) {
-  test.ok(/^([0-9]+)\.([0-9]+)\.([0-9]+)/.test(queue.version));
-  test.end();
-});
-
 tape("example queue of fs.stat", function(test) {
   queue.queue()
       .defer(fs.stat, __dirname + "/../index.js")
