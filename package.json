@@ -4,6 +4,7 @@
   "description": "Evaluate asynchronous tasks with configurable concurrency.",
   "keywords": [
     "d3",
+    "d3-module",
     "asynchronous",
     "async",
     "queue"
