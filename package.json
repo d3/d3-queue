@@ -16,6 +16,7 @@
     "url": "http://bost.ocks.org/mike"
   },
   "main": "build/d3-queue.js",
+  "module": "index",
   "jsnext:main": "index",
   "repository": {
     "type": "git",
@@ -25,12 +26,12 @@
     "pretest": "rm -rf build && mkdir build && rollup --banner \"$(preamble)\" -f umd -n d3 -o build/d3-queue.js -- index.js",
     "test": "tape 'test/**/*-test.js' && eslint index.js src",
     "prepublish": "npm run test && uglifyjs --preamble \"$(preamble)\" build/d3-queue.js -c -m -o build/d3-queue.min.js",
-    "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cp -v README.md LICENSE build/d3-queue.js ../d3-queue-bower && cd ../d3-queue-bower && git add README.md LICENSE d3-queue.js && git commit -m \"Release $VERSION.\" && git tag -am \"Release $VERSION.\" v${VERSION} && git push && git push --tags && cd ../d3-queue && cp build/d3-queue.js ../d3.github.com/d3-queue.v3.js && cp build/d3-queue.min.js ../d3.github.com/d3-queue.v3.min.js && cd ../d3.github.com && git add d3-queue.v3.js d3-queue.v3.min.js && git commit -m \"d3-queue ${VERSION}\" && git push && cd - && zip -j build/d3-queue.zip -- LICENSE README.md build/d3-queue.js build/d3-queue.min.js"
+    "postpublish": "VERSION=`node -e 'console.log(require(\"./package.json\").version)'`; git push && git push --tags && cd ../d3-queue-bower && git pull && cp -v ../d3-queue/README.md ../d3-queue/LICENSE ../d3-queue/build/d3-queue.js . && git add README.md LICENSE d3-queue.js && git commit -m \"Release $VERSION.\" && git tag -am \"Release $VERSION.\" v${VERSION} && git push && git push --tags && cd ../d3.github.com && git pull && cp ../d3-queue/build/d3-queue.js d3-queue.v3.js && cp ../d3-queue/build/d3-queue.min.js d3-queue.v3.min.js && git add d3-queue.v3.js d3-queue.v3.min.js && git commit -m \"d3-queue ${VERSION}\" && git push && cd - && zip -j build/d3-queue.zip -- LICENSE README.md build/d3-queue.js build/d3-queue.min.js"
   },
   "devDependencies": {
     "eslint": "2",
     "package-preamble": "0.0",
-    "rollup": "0.31",
+    "rollup": "0.34",
     "tape": "4",
     "uglify-js": "2"
   }
