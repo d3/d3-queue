@@ -126,11 +126,11 @@ var q = d3.queue();
 
 ## API Reference
 
-<a href="#queue" name="queue">#</a> d3.<b>queue</b>([<i>concurrency</i>])
+<a href="#queue" name="queue">#</a> d3.<b>queue</b>([<i>concurrency</i>]) [<>](https://github.com/d3/d3-queue/blob/master/src/queue.js "Source")
 
 Constructs a new queue with the specified *concurrency*. If *concurrency* is not specified, the queue has infinite concurrency. Otherwise, *concurrency* is a positive integer. For example, if *concurrency* is 1, then all tasks will be run in series. If *concurrency* is 3, then at most three tasks will be allowed to proceed concurrently; this is useful, for example, when loading resources in a web browser.
 
-<a href="#queue_defer" name="queue_defer">#</a> <i>queue</i>.<b>defer</b>(<i>task</i>[, <i>arguments</i>…])
+<a href="#queue_defer" name="queue_defer">#</a> <i>queue</i>.<b>defer</b>(<i>task</i>[, <i>arguments</i>…]) [<>](https://github.com/d3/d3-queue/blob/master/src/queue.js#L20 "Source")
 
 Adds the specified asynchronous *task* callback to the queue, with any optional *arguments*. The *task* is a function that will be called when the task should start. It is passed the specified optional *arguments* and an additional *callback* as the last argument; the callback must be invoked by the task when it finishes. The task must invoke the callback with two arguments: the *error*, if any, and the *result* of the task. To return multiple results from a single callback, wrap the results in an object or array.
 
@@ -148,11 +148,11 @@ If the task calls back with an error, any tasks that were scheduled *but not yet
 
 Tasks can only be deferred before [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) is called. If a task is deferred after then, an error is thrown. If the *task* is not a function, an error is thrown.
 
-<a href="#queue_abort" name="queue_abort">#</a> <i>queue</i>.<b>abort</b>()
+<a href="#queue_abort" name="queue_abort">#</a> <i>queue</i>.<b>abort</b>() [<>](https://github.com/d3/d3-queue/blob/master/src/queue.js#L29 "Source")
 
 Aborts any active tasks, invoking each active task’s *task*.abort function, if any. Also prevents any new tasks from starting, and immediately invokes the [*queue*.await](#queue_await) or [*queue*.awaitAll](#queue_awaitAll) callback with an error indicating that the queue was aborted. See the [introduction](#d3-queue) for an example implementation of an abortable task. Note that if your tasks are not abortable, any running tasks will continue to run, even after the await callback has been invoked with the abort error. The await callback is invoked exactly once on abort, and so is not called when any running tasks subsequently succeed or fail.
 
-<a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>)
+<a href="#queue_await" name="queue_await">#</a> <i>queue</i>.<b>await</b>(<i>callback</i>) [<>](https://github.com/d3/d3-queue/blob/master/src/queue.js#L33 "Source")
 
 Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If an error occurred, there are no additional arguments to the callback. Otherwise, the *callback* is passed each result as an additional argument. For example:
 
@@ -165,7 +165,7 @@ d3.queue()
 
 If all [deferred](#queue_defer) tasks have already completed, the callback will be invoked immediately. This method may only be called once, after any tasks have been deferred. If this method is called multiple times, or if it is called after [*queue*.awaitAll](#queue_awaitAll), an error is thrown. If the *callback* is not a function, an error is thrown.
 
-<a href="#queue_awaitAll" name="queue_awaitAll">#</a> <i>queue</i>.<b>awaitAll</b>(<i>callback</i>)
+<a href="#queue_awaitAll" name="queue_awaitAll">#</a> <i>queue</i>.<b>awaitAll</b>(<i>callback</i>) [<>](https://github.com/d3/d3-queue/blob/master/src/queue.js#L39 "Source")
 
 Sets the *callback* to be invoked when all deferred tasks have finished. The first argument to the *callback* is the first error that occurred, or null if no error occurred. If an error occurred, there are no additional arguments to the callback. Otherwise, the *callback* is also passed an array of results as the second argument. For example:
 
