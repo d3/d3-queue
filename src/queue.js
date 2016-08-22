@@ -45,8 +45,13 @@ Queue.prototype = queue.prototype = {
 };
 
 function poke(q) {
-  if (!q._start) try { start(q); } // let the current task complete
-  catch (e) { if (q._tasks[q._ended + q._active - 1]) abort(q, e); } // task errored synchronously
+  if (!q._start) {
+    try { start(q); } // let the current task complete
+    catch (e) {
+      if (q._tasks[q._ended + q._active - 1]) abort(q, e); // task errored synchronously
+      else if (!q._data) throw e; // await callback errored synchronously
+    }
+  }
 }
 
 function start(q) {
@@ -88,8 +93,10 @@ function abort(q, e) {
   while (--i >= 0) {
     if (t = q._tasks[i]) {
       q._tasks[i] = null;
-      if (t.abort) try { t.abort(); }
-      catch (e) { /* ignore */ }
+      if (t.abort) {
+        try { t.abort(); }
+        catch (e) { /* ignore */ }
+      }
     }
   }
 
@@ -98,7 +105,11 @@ function abort(q, e) {
 }
 
 function maybeNotify(q) {
-  if (!q._active && q._call) q._call(q._error, q._data);
+  if (!q._active && q._call) {
+    var d = q._data;
+    q._data = undefined; // allow gc
+    q._call(q._error, d);
+  }
 }
 
 export default function queue(concurrency) {

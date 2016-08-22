@@ -446,6 +446,30 @@ tape("if a task throws an error aftering calling back synchronously, the error i
   }
 });
 
+tape("if the await callback throws an error aftering calling back synchronously, the error is thrown", function(test) {
+  queue.queue(1)
+      .defer(function(callback) { process.nextTick(callback); })
+      .defer(function(callback) { callback(null, 1); })
+      .await(function() { throw new Error("foo"); });
+
+  process.once("uncaughtException", function(error) {
+    test.equal(error.message, "foo");
+    test.end();
+  });
+});
+
+tape("if a task errors, another task can still complete successfully, and is ignored", function(test) {
+  queue.queue()
+      .defer(function(callback) { setTimeout(function() { callback(null, 1); }, 10); })
+      .defer(function(callback) { callback(new Error("foo")); })
+      .await(callback);
+
+  function callback(error) {
+    test.equal(error.message, "foo");
+    test.end();
+  }
+});
+
 tape("if a task errors, it is not subsequently aborted", function(test) {
   var aborted = false;
 
