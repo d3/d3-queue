@@ -1,6 +1,6 @@
 {
   "name": "d3-queue",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Evaluate asynchronous tasks with configurable concurrency.",
   "keywords": [
     "d3",
