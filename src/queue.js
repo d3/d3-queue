@@ -3,7 +3,7 @@ import {slice} from "./array";
 var noabort = {};
 
 function Queue(size) {
-  if (!(size >= 1)) throw new Error;
+  if (!((size = +size) >= 1)) throw new Error("invalid size");
   this._size = size;
   this._call =
   this._error = null;
@@ -18,7 +18,8 @@ function Queue(size) {
 Queue.prototype = queue.prototype = {
   constructor: Queue,
   defer: function(callback) {
-    if (typeof callback !== "function" || this._call) throw new Error;
+    if (typeof callback !== "function") throw new Error("invalid callback");
+    if (this._call) throw new Error("defer after await");
     if (this._error != null) return this;
     var t = slice.call(arguments, 1);
     t.push(callback);
@@ -31,13 +32,15 @@ Queue.prototype = queue.prototype = {
     return this;
   },
   await: function(callback) {
-    if (typeof callback !== "function" || this._call) throw new Error;
+    if (typeof callback !== "function") throw new Error("invalid callback");
+    if (this._call) throw new Error("multiple await");
     this._call = function(error, results) { callback.apply(null, [error].concat(results)); };
     maybeNotify(this);
     return this;
   },
   awaitAll: function(callback) {
-    if (typeof callback !== "function" || this._call) throw new Error;
+    if (typeof callback !== "function") throw new Error("invalid callback");
+    if (this._call) throw new Error("multiple await");
     this._call = callback;
     maybeNotify(this);
     return this;
