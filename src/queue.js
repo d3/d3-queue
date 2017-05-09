@@ -3,7 +3,6 @@ import {slice} from "./array";
 var noabort = {};
 
 function Queue(size) {
-  if (!((size = +size) >= 1)) throw new Error("invalid size");
   this._size = size;
   this._call =
   this._error = null;
@@ -116,5 +115,7 @@ function maybeNotify(q) {
 }
 
 export default function queue(concurrency) {
-  return new Queue(arguments.length ? +concurrency : Infinity);
+  if (concurrency == null) concurrency = Infinity;
+  else if (!((concurrency = +concurrency) >= 1)) throw new Error("invalid concurrency");
+  return new Queue(concurrency);
 }
