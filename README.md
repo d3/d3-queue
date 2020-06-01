@@ -1,6 +1,6 @@
 # d3-queue
 
-**Deprecation notice**: Consider using the native [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) instead.
+**Deprecation notice**: Now that D3 uses Promises rather than callbacks (see [d3-fetch](https://github.com/d3/d3-fetch)), this library is no longer needed. Use [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) instead, or [p-queue](https://github.com/sindresorhus/p-queue) if you need configurable concurrency.
 
 A **queue** evaluates zero or more *deferred* asynchronous tasks with configurable concurrency: you control how many tasks run at the same time. When all the tasks complete, or an error occurs, the queue passes the results to your *await* callback. This library is similar to [Async.js](https://github.com/caolan/async)’s [parallel](https://github.com/caolan/async#paralleltasks-callback) (when *concurrency* is infinite), [series](https://github.com/caolan/async#seriestasks-callback) (when *concurrency* is 1), and [queue](https://github.com/caolan/async#queue), but features a smaller footprint.
 
